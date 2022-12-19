@@ -42,5 +42,4 @@ async def retrieve_finding(finding_id) -> FindingModel:
 
 # set false-positive
 async def set_false_positive(finding: FindingModel) -> FindingModel:
-    #return await findings_collection.update_one({finding}, {'$set': finding.falsePositive})
-    pass
+    return await findings_collection.update_one({'_id': finding.id}, {'$set': finding.falsePositive})

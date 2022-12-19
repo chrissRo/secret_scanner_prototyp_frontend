@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Any, Type, Union
 from pydantic import BaseModel, Field, DirectoryPath, validator, PositiveInt
 
+from utils.PyObjectId import PyObjectId
 from .gitleaks_raw_result import GitleaksRawResultModel
 from .raw_result import RawResultModel
 from .false_positive import FalsePositiveModel
@@ -9,6 +10,7 @@ from ...globals.global_config import AvailableScanner, InputType
 
 
 class FindingModel(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     scannerType: AvailableScanner
     scannerVersion: str = Field(...)
     inputType: InputType
@@ -27,6 +29,9 @@ class FindingModel(BaseModel):
         else:
             raise TypeError('Wrong type for resultRaw. Must be of type RawResult')
 
+    class Config:
+        allow_population_by_field_name = True
+        json_encoders = {PyObjectId: str}
 
 def ResponseModel(data, message):
     return {

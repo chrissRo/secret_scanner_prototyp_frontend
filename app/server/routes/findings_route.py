@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from app.server.controllers.findings_controller import retrieve_all_findings
-from app.server.models.finding_model import ResponseModel, ErrorResponseModel
+from app.server.controllers.findings_controller import retrieve_all_findings, set_false_positive
+from app.server.models.finding_model import ResponseModel, ErrorResponseModel, FindingModel
 
 router = APIRouter()
 
@@ -22,5 +22,5 @@ async def get_all_findings():
 #####################################
 
 @router.put('/', response_description='Update false-positive-assignment')
-async def put_false_positive():
-    pass
+async def put_false_positive(finding: FindingModel):
+    finding = await set_false_positive(finding=finding)
