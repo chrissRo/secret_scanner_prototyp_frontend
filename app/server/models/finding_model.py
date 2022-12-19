@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Any, Type, Union
-from pydantic import BaseModel, Field, DirectoryPath, validator, PositiveInt
+from pydantic import BaseModel, Field, DirectoryPath, validator, PositiveInt, StrictBool
 
 from utils.PyObjectId import PyObjectId
 from .gitleaks_raw_result import GitleaksRawResultModel
@@ -32,6 +32,15 @@ class FindingModel(BaseModel):
     class Config:
         allow_population_by_field_name = True
         json_encoders = {PyObjectId: str}
+
+
+class UpdateFindingModel(BaseModel):
+    falsePositive: FalsePositiveModel = Field(...)
+
+    class Config:
+        allow_population_by_field_name = True
+        json_encoders = {PyObjectId: str}
+        arbitrary_types_allowed = True
 
 def ResponseModel(data, message):
     return {
