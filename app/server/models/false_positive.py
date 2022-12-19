@@ -8,8 +8,8 @@ class FalsePositiveModel(BaseModel):
     change_date: datetime = Field(...)
     
     @validator('justification')
-    def false_positive_needs_justification(cls, value, values):
-        if values.get('isFalsePositive') is True and value == '':
+    def false_positive_needs_justification(cls, value):
+        if value == '':
             raise ValueError('Please provide justification for falsePositive')
         else:
             return value

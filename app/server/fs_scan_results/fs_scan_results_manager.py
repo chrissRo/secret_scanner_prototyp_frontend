@@ -121,7 +121,7 @@ class FSScanResultsManager:
                                                                       scan["scan_date"])),
                                                                   resultRaw=GitleaksRawResultModel(
                                                                       **raw_result),
-                                                                  falsePositive=FalsePositiveModel(),
+                                                                  falsePositive=FalsePositiveModel(justification="init"),
                                                                   scannerVersion=self._scanner_version,
                                                                   save_date=datetime.today()))
                 except ValidationError as e:
