@@ -3,11 +3,13 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.params import Body
 from starlette.requests import Request
 
-from app.server.controllers.findings_controller import retrieve_all_findings, set_false_positive,retrieve_single_finding
+from app.server.controllers.findings_controller import retrieve_all_findings, set_false_positive, \
+    retrieve_single_finding
 from app.server.models.false_positive import FalsePositiveModel
 from app.server.models.finding_model import ResponseModel, ErrorResponseModel, FindingModel, UpdateFindingModel
 
 router = APIRouter()
+
 
 #####################################
 # FINDINGGS GET
@@ -21,9 +23,14 @@ async def get_all_findings():
     else:
         return ErrorResponseModel('An error occurred.', 500, 'Could not retrieve findings.')
 
+
 @router.get('/{finding_id}', response_description='Get single finding')
 async def get_single_finding(finding_id: str):
-    return await retrieve_single_finding(finding_id = finding_id)
+    finding = await retrieve_single_finding(finding_id=finding_id)
+    if finding:
+        return ResponseModel(finding, 'Finding {} retrieved successfully.'.format(finding_id))
+    else:
+        ErrorResponseModel('An error occurred.', 500, 'Could not retrieve finding {}')
 
 
 #####################################
@@ -32,7 +39,6 @@ async def get_single_finding(finding_id: str):
 
 @router.put('/{finding_id}', response_description='Update false-positive-assignment')
 async def put_false_positive(finding_id: str, update_finding_model: UpdateFindingModel = Body(...)):
-
     update_result = await set_false_positive(finding_id=finding_id, update_false_positive=update_finding_model)
 
     if update_result.modified_count == 1:
