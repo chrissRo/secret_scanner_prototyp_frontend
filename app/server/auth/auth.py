@@ -8,7 +8,7 @@ from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 
 from app.server.controllers import user_controller
-from app.server.models.user_models.user import UserModel, UserResponseModel
+from app.server.models.user_models.user import UserModel, UserPublicModel
 from config.config import JWTConfig
 
 
@@ -28,11 +28,11 @@ class Auth:
     def get_password_hash(self, plain_password) -> str:
         return self._pwd_context.hash(plain_password)
 
-    async def authenticate_user(self, username: UserModel.username, password: UserModel.password) -> UserResponseModel:
-        user = await user_controller.retrieve_single_user(user_name=username)
+    async def authenticate_user(self, username: str, password: str) -> UserPublicModel:
+        user = await user_controller.retrieve_single_user_private(username=username)
         if user:
             if self.verify_password(plain_password=password, hashed_password=user.password):
-                return UserResponseModel(username=user.username, email=user.email)
+                return UserPublicModel(username=user.username, email=user.email)
         # Todo Error Handling
 
     def create_access_token(self, jwt_token: dict):
@@ -44,7 +44,7 @@ class Auth:
             algorithm=self.jwt_signing_algorithm
         )
 
-    async def get_current_user(self) -> UserResponseModel:
+    async def get_current_user(self) -> UserPublicModel:
         payload = jwt.decode(
             jwt=self._oauth2scheme,
             key=self.jwt_secret_key,
@@ -52,8 +52,7 @@ class Auth:
         )
         username = payload.get("sub")
         if username:
-            user = await user_controller.retrieve_single_user(user_name=username)
-            return UserResponseModel(username=user.username, email=user.email)
+            return await user_controller.retrieve_single_user(username=username)
 
 
 auth = Auth()

@@ -1,3 +1,4 @@
+from bson import ObjectId
 from pydantic import BaseModel, Field, StrictBool, EmailStr
 
 from utils.PyObjectId import PyObjectId
@@ -15,7 +16,7 @@ class UserModel(BaseModel):
         json_encoders = {PyObjectId: str}
 
 
-class UserResponseModel(BaseModel):
+class UserPublicModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     username: str = Field(...)
     active: StrictBool = False

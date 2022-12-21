@@ -16,7 +16,7 @@ router = APIRouter()
 @router.post('/', response_model=TokenModel)
 async def get_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user = auth.authenticate_user(username=form_data.username, password=form_data.password)
-    if user:
+    if user and user.active:
         return {
             "access_token": auth.create_access_token(
                 jwt_token={

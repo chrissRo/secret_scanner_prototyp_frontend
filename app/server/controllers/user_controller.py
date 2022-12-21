@@ -1,26 +1,37 @@
+from asyncio import sleep
+
+from fastapi.encoders import jsonable_encoder
+
 from app.server.auth.auth import auth
 from app.server.database import user_collection
-from app.server.models.user_models.user import UserModel, UserResponseModel
+from app.server.models.user_models.user import UserModel, UserPublicModel
 
 
 #####################################
 # GET
 #####################################
 
-async def retrieve_single_user(user_id='', user_name='') -> UserModel:
+async def retrieve_single_user(user_id: str = '', username: str = '') -> UserPublicModel:
     if user_id:
         return await user_collection.find_one({'_id': user_id})
-    if user_name:
-        return await user_collection.find_one({'username': user_name})
+    if username:
+        return await user_collection.find_one({'username': username})
 
+async def retrieve_single_user_private(username: str) -> UserModel:
+    return await user_collection.find_one({'username:': username})
+
+async def retrieve_all_user() -> list:
+    users = []
+    async for user in user_collection.find():
+        users.append(user)
+    return users
 
 #####################################
 # POST
 #####################################
 
-async def insert_single_user(user: UserModel) -> UserResponseModel:
+async def insert_single_user(user: UserModel):
     user.password = auth.get_password_hash(plain_password=user.password)
-    user = await user_collection.insert_one(user)
-    new_user = await user_collection.find_one({'_id': user.inserted_id})
-    if new_user:
-        return UserResponseModel(username=new_user.username, email=new_user.email)
+    return await user_collection.insert_one(jsonable_encoder(user))
+
+
