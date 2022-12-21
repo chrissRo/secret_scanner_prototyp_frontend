@@ -24,7 +24,7 @@ class UserPublicModel(BaseModel):
 
     class Config:
         allow_population_by_field_name = True
-        json_encoders = {PyObjectId: str}
+        json_encoders = {ObjectId: str}
 
 
 def ResponseModel(data, message):
