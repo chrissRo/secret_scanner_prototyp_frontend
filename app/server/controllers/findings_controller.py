@@ -23,11 +23,11 @@ async def retrieve_all_findings() -> list:
 async def retrieve_findings(findings_ids: list) -> list:
     findings = []
     for finding_id in findings_ids:
-        findings.append(await retrieve_finding(finding_id))
+        findings.append(await retrieve_single_finding(finding_id))
     return findings
 
 # get single finding
-async def retrieve_finding(finding_id: str) -> FindingModel:
+async def retrieve_single_finding(finding_id: str) -> FindingModel:
     return await findings_collection.find_one({'_id': finding_id})
 
 #####################################
