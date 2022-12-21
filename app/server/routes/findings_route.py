@@ -1,11 +1,8 @@
 from fastapi import APIRouter
-from fastapi.encoders import jsonable_encoder
 from fastapi.params import Body
-from starlette.requests import Request
 
 from app.server.controllers.findings_controller import retrieve_all_findings, set_false_positive, \
     retrieve_single_finding
-from app.server.models.false_positive import FalsePositiveModel
 from app.server.models.finding_model import ResponseModel, ErrorResponseModel, FindingModel, UpdateFindingModel
 
 router = APIRouter()
