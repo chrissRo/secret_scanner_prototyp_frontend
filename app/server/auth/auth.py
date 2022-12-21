@@ -32,7 +32,7 @@ class Auth:
         user = await user_controller.retrieve_single_user_private(username=username)
         if user:
             if self.verify_password(plain_password=password, hashed_password=user.password):
-                return UserPublicModel(username=user.username, email=user.email)
+                return UserPublicModel(username=user.username, email=user.email, active=user.active)
         # Todo Error Handling
 
     def create_access_token(self, jwt_token: dict):
