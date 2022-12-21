@@ -1,7 +1,7 @@
 from fastapi.encoders import jsonable_encoder
 from ..database import findings_collection
 # https://stackoverflow.com/questions/71467630/fastapi-issues-with-mongodb-typeerror-objectid-object-is-not-iterable
-from ..models.finding_model import FindingModel, UpdateFindingModel
+from app.server.models.finding_models.finding_model import FindingModel, UpdateFindingModel
 
 
 #####################################

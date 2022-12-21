@@ -1,12 +1,12 @@
 from datetime import datetime
 from typing import Union
-from pydantic import BaseModel, Field, DirectoryPath, validator, PositiveInt, StrictBool
+from pydantic import BaseModel, Field, DirectoryPath, validator
 
 from utils.PyObjectId import PyObjectId
-from .gitleaks_raw_result import GitleaksRawResultModel
-from .raw_result import RawResultModel
-from .false_positive import FalsePositiveModel
-from ...globals.global_config import AvailableScanner, InputType
+from app.server.models.finding_models.gitleaks_raw_result import GitleaksRawResultModel
+from app.server.models.finding_models.raw_result import RawResultModel
+from app.server.models.finding_models.false_positive import FalsePositiveModel
+from app.globals.global_config import AvailableScanner, InputType
 
 
 class FindingModel(BaseModel):

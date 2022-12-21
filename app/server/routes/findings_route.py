@@ -3,13 +3,13 @@ from fastapi.params import Body
 
 from app.server.controllers.findings_controller import retrieve_all_findings, set_false_positive, \
     retrieve_single_finding
-from app.server.models.finding_model import ResponseModel, ErrorResponseModel, FindingModel, UpdateFindingModel
+from app.server.models.finding_models.finding_model import ResponseModel, ErrorResponseModel, UpdateFindingModel
 
 router = APIRouter()
 
 
 #####################################
-# FINDINGGS GET
+# GET
 #####################################
 
 @router.get('/', response_description='Get all findings')
@@ -31,7 +31,7 @@ async def get_single_finding(finding_id: str):
 
 
 #####################################
-# FINDINGGS PUT
+# PUT
 #####################################
 
 @router.put('/{finding_id}', response_description='Update false-positive-assignment')

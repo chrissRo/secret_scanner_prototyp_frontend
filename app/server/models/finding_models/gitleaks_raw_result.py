@@ -1,8 +1,7 @@
 from datetime import datetime
-from typing import Any
 
-from pydantic import Field, EmailStr, PositiveFloat, PositiveInt, validator
-from .raw_result import RawResultModel
+from pydantic import Field, EmailStr, PositiveFloat, PositiveInt
+from app.server.models.finding_models.raw_result import RawResultModel
 
 
 class GitleaksRawResultModel(RawResultModel):
