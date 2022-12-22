@@ -1,5 +1,4 @@
 from fastapi.encoders import jsonable_encoder
-from app.server.auth.auth import auth
 from app.server.database import user_collection
 from app.server.models.user_models.user import UserModel, UserPublicModel
 
@@ -31,5 +30,6 @@ async def retrieve_all_user() -> list:
 #####################################
 
 async def insert_single_user(user: UserModel):
+    from app.server.auth.auth import auth
     user.password = auth.get_password_hash(plain_password=user.password)
     return await user_collection.insert_one(jsonable_encoder(user))
