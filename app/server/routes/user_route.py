@@ -24,7 +24,7 @@ async def get_all_user():
 # POST
 #####################################
 
-@router.post('/')
+@router.post('/signup')
 async def create_user(user: UserModel = Body(...)):
     user_check = await user_controller.retrieve_single_user(username=user.username)
     if not user_check:

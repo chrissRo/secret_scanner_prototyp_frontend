@@ -3,7 +3,9 @@ from datetime import datetime, timedelta
 
 import jwt as jwt
 from dotenv import load_dotenv
+from fastapi import HTTPException
 from fastapi.security import OAuth2PasswordBearer
+from jwt import ExpiredSignatureError
 from passlib.context import CryptContext
 
 from app.server.controllers import user_controller
@@ -12,6 +14,13 @@ from config.config import JWTConfig
 
 
 class Auth:
+    @property
+    def oauth2scheme(self):
+        return self._oauth2scheme
+
+    @oauth2scheme.setter
+    def oauth2scheme(self, value):
+        self._oauth2scheme = value
 
     def __init__(self):
         load_dotenv()
@@ -34,25 +43,35 @@ class Auth:
                 return UserPublicModel(username=user['username'], email=user['email'], active=user['active'])
         # Todo Error Handling
 
-    def create_access_token(self, jwt_token: dict) -> dict:
-        jwt_token.update({
-                "exp": datetime.utcnow() + timedelta(self.jwt_expiration_time_mins)
+    def create_access_token(self, json_web_token: dict) -> dict:
+        json_web_token.update({
+                "exp": datetime.utcnow() + timedelta(minutes=self.jwt_expiration_time_mins),
+                'iss': JWTConfig.ISSUER
             })
         return jwt.encode(
-            payload=jwt_token,
+            payload=json_web_token,
             key=self.jwt_secret_key,
             algorithm=self.jwt_signing_algorithm
         )
 
-    async def get_current_user(self) -> UserPublicModel:
+    async def get_current_user(self, token: jwt) -> UserPublicModel:
         payload = jwt.decode(
-            jwt=self._oauth2scheme,
+            jwt=token,
             key=self.jwt_secret_key,
             algorithms=[self.jwt_signing_algorithm]
         )
         username = payload.get("sub")
         if username:
             return await user_controller.retrieve_single_user(username=username)
+
+    async def is_authenticated(self, token: jwt) -> bool:
+        try:
+            current_user = await self.get_current_user(token=token)
+            if current_user and current_user['active']:
+                return True
+            return False
+        except ExpiredSignatureError:
+            raise HTTPException(status_code=403, detail='token expired')
 
 
 auth = Auth()

@@ -9,4 +9,5 @@ class GitleaksConfig:
 
 class JWTConfig:
     ALGORITHM = 'HS256'
-    ACCESS_TOKEN_EXPIRE_MINUTES = 30
+    ACCESS_TOKEN_EXPIRE_MINUTES = 1
+    ISSUER = 'Team ISS'

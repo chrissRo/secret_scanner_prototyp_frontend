@@ -1,15 +1,12 @@
-import json
-from datetime import timedelta
-
 from fastapi import APIRouter
 from fastapi.params import Depends
 from fastapi.security import OAuth2PasswordRequestForm
-
-from app.server.auth.auth import Auth, auth
-from app.server.models.token_models.auth_token import TokenModel
-from app.server.models.user_models.user import ErrorResponseModel
+from app.server.auth.auth import auth
+from app.server.models.user_models.user import ErrorResponseModel, ResponseModel
+from app.server.routes import user_route
 
 router = APIRouter()
+
 
 #####################################
 # POST
@@ -22,7 +19,7 @@ async def get_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     if user and user.active:
         return {
             "access_token": auth.create_access_token(
-                jwt_token={
+                json_web_token={
                     'sub': user.username
                 }),
             'token_type': 'bearer'
@@ -32,3 +29,15 @@ async def get_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
         print('Invalid username or password')
         return ErrorResponseModel('NoLogin', code=403, message='Invalid Username or Password, or user inactive')
 
+
+#####################################
+# GET
+#####################################
+
+@router.get('/', response_description='Test-Route')
+async def get_current_user(token=Depends(auth.oauth2scheme)):
+    if await auth.is_authenticated(token=token):
+        user = await auth.get_current_user(token=token)
+        return ResponseModel(data=user, message='Session active, got User')
+    else:
+        return ErrorResponseModel(error='Invalid User', code=403, message='Please login')
