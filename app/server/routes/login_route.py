@@ -1,3 +1,4 @@
+import json
 from datetime import timedelta
 
 from fastapi import APIRouter
@@ -17,7 +18,7 @@ router = APIRouter()
 @router.post('/')
 async def get_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user = await auth.authenticate_user(username=form_data.username, password=form_data.password)
-    print(user)
+    print(user.username)
     if user and user.active:
         return {
             "access_token": auth.create_access_token(

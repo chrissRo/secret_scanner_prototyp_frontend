@@ -1,7 +1,4 @@
-from asyncio import sleep
-
 from fastapi.encoders import jsonable_encoder
-
 from app.server.auth.auth import auth
 from app.server.database import user_collection
 from app.server.models.user_models.user import UserModel, UserPublicModel
@@ -19,7 +16,7 @@ async def retrieve_single_user(user_id: str = '', username: str = '') -> UserPub
 
 
 async def retrieve_single_user_private(username: str) -> UserModel:
-    return await user_collection.find_one({'username:': username})
+    return await user_collection.find_one({'username': username})
 
 
 async def retrieve_all_user() -> list:
