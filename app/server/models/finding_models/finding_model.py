@@ -1,14 +1,16 @@
 from datetime import datetime
-from typing import Any, Type, Union
-from pydantic import BaseModel, Field, DirectoryPath, validator, PositiveInt
+from typing import Union
+from pydantic import BaseModel, Field, DirectoryPath, validator
 
-from .gitleaks_raw_result import GitleaksRawResultModel
-from .raw_result import RawResultModel
-from .false_positive import FalsePositiveModel
-from ...globals.global_config import AvailableScanner, InputType
+from utils.PyObjectId import PyObjectId
+from app.server.models.finding_models.gitleaks_raw_result import GitleaksRawResultModel
+from app.server.models.finding_models.raw_result import RawResultModel
+from app.server.models.finding_models.false_positive import FalsePositiveModel
+from app.globals.global_config import AvailableScanner, InputType
 
 
 class FindingModel(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     scannerType: AvailableScanner
     scannerVersion: str = Field(...)
     inputType: InputType
@@ -27,6 +29,18 @@ class FindingModel(BaseModel):
         else:
             raise TypeError('Wrong type for resultRaw. Must be of type RawResult')
 
+    class Config:
+        allow_population_by_field_name = True
+        json_encoders = {PyObjectId: str}
+
+
+class UpdateFindingModel(BaseModel):
+    falsePositive: FalsePositiveModel = Field(...)
+
+    class Config:
+        allow_population_by_field_name = True
+        json_encoders = {PyObjectId: str}
+        arbitrary_types_allowed = True
 
 def ResponseModel(data, message):
     return {

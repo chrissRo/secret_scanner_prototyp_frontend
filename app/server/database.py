@@ -11,3 +11,4 @@ mongo_details = f"mongodb://{os.getenv('MONGODB_USER')}:{os.getenv('MONGODB_PASS
 db_client = motor.motor_asyncio.AsyncIOMotorClient(mongo_details)
 
 findings_collection = db_client.findings.get_collection('findings_collection')
+user_collection = db_client.users.get_collection('user_collection')

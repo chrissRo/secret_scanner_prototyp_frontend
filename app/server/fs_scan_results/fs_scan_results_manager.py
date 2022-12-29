@@ -10,9 +10,9 @@ from pydantic import ValidationError
 from app.globals.global_config import AvailableScanner, InputType
 from app.server import database
 from app.server.database import findings_collection
-from app.server.models.false_positive import FalsePositiveModel
-from app.server.models.finding_model import FindingModel
-from app.server.models.gitleaks_raw_result import GitleaksRawResultModel
+from app.server.models.finding_models.false_positive import FalsePositiveModel
+from app.server.models.finding_models.finding_model import FindingModel
+from app.server.models.finding_models.gitleaks_raw_result import GitleaksRawResultModel
 from config.config import GitleaksConfig
 import os
 
@@ -121,7 +121,7 @@ class FSScanResultsManager:
                                                                       scan["scan_date"])),
                                                                   resultRaw=GitleaksRawResultModel(
                                                                       **raw_result),
-                                                                  falsePositive=FalsePositiveModel(),
+                                                                  falsePositive=FalsePositiveModel(justification="init"),
                                                                   scannerVersion=self._scanner_version,
                                                                   save_date=datetime.today()))
                 except ValidationError as e:
