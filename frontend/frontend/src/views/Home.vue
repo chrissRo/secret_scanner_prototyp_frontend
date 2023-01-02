@@ -14,6 +14,7 @@ export default {
       overviewBlock: 'overview-block',
       overviewElement: 'overview-element',
       repoList: 'repo-list',
+      repoSearchBar: 'repo-search-bar',
       repoMockList,
       listItem: 'list-item',
       searchRepo: null
@@ -22,11 +23,8 @@ export default {
   computed: {
     searchRepoList() {
       if (!this.searchRepo) {
-        console.log("Value -1")
         return this.repoMockList
       } else {
-        console.log("Other ID")
-        console.log(this.searchRepo.id)
         return this.repoMockList.filter((r) => r.id === this.searchRepo.id)
       }
     }
@@ -52,19 +50,28 @@ export default {
 
     </v-container>
 
+
+
     <div :class="repoList">
       <h2>Repository List</h2>
-      <div>
-        <v-autocomplete
-          :items="repoMockList"
-          v-model="searchRepo"
-          item-title="name"
-          label="Search Repository"
-          prepend-icon="mdi-database-search"
-          clearable
-          return-object
-        />
-      </div>
+      <v-container :class="repoSearchBar" fluid>
+        <v-row >
+          <v-col/>
+          <v-col>
+            <div >
+              <v-autocomplete
+                :items="repoMockList"
+                v-model="searchRepo"
+                item-title="name"
+                label="Search Repository"
+                prepend-icon="mdi-database-search"
+                clearable
+                return-object
+              />
+            </div>
+          </v-col>
+        </v-row>
+      </v-container>
 
       <v-card class="mx-auto" >
         <v-list>
@@ -108,5 +115,11 @@ export default {
 
 .list-item:hover {
   background-color: aliceblue;
+}
+
+.repo-search-bar {
+  margin: 1em;
+  width: 100%;
+  justify-content: flex-end
 }
 </style>
