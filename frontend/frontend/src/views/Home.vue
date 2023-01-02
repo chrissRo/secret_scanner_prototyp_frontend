@@ -20,6 +20,14 @@ export default {
       searchRepo: null
     }
   },
+  methods: {
+    getOverviewData() {
+      return {
+        reposAmount: this.repoMockList.length,
+        falsePositivesAmount: 2
+      }
+    }
+  },
   computed: {
     searchRepoList() {
       if (!this.searchRepo) {
@@ -38,19 +46,17 @@ export default {
     <v-container>
       <v-row no-gutters :class="overviewElement">
         <v-col>
-          <v-card title="#Repos" text="1"></v-card>
+          <v-card title="#Repos" :text="getOverviewData().reposAmount"></v-card>
         </v-col>
         <v-col>
-          <v-card title="#Falsch-Positive" text="1"></v-card>
+          <v-card title="#Falsch-Positive" :text="getOverviewData().falsePositivesAmount"></v-card>
         </v-col>
         <v-col>
           <v-card title="Weitere Infos auf 1 Blick" text="yolo"></v-card>
         </v-col>
       </v-row>
-
     </v-container>
-
-
+  </div>
 
     <div :class="repoList">
       <h2>Repository List</h2>
@@ -58,7 +64,7 @@ export default {
         <v-row >
           <v-col/>
           <v-col>
-            <div >
+            <div>
               <v-autocomplete
                 :items="repoMockList"
                 v-model="searchRepo"
@@ -72,15 +78,28 @@ export default {
           </v-col>
         </v-row>
       </v-container>
-
       <v-card class="mx-auto" >
         <v-list>
+          <v-row>
+            <v-col>
+              RepoName
+              <v-divider/>
+            </v-col>
+            <v-col>
+              LastScan
+              <v-divider/>
+            </v-col>
+            <v-list-item>
+              Go To
+              <v-divider/>
+            </v-list-item>
+          </v-row>
         <v-list-item
           v-for="repo in searchRepoList"
           :key="repo.id"
           :class="listItem"
         >
-          <v-container>
+          <v-container fluid>
             <v-row >
               <v-col>
                 {{ repo.name }}
@@ -100,7 +119,7 @@ export default {
         </v-list>
       </v-card>
     </div>
-  </div>
+
 </template>
 
 <style>
@@ -109,6 +128,9 @@ export default {
   margin: 3em
 }
 
+.repo-list {
+  margin: 3em;
+}
 .overview-element {
   margin: 2em
 }
