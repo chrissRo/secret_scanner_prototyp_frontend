@@ -57,6 +57,8 @@ export default {
       mockScanResult,
       mockScanResults: [mockScanResult],
       rawResultDialog: false,
+      falsePositiveDialog: false,
+      falsePositiveReadOnly: true,
       }
   },
   methods: {
@@ -67,6 +69,15 @@ export default {
         falsePositivesAmount: this.mockRepo.falsePositivesAmount,
         toReviewAmount: this.mockRepo.toReviewAmount
       }
+    },
+    editFalsePositive() {
+      this.falsePositiveReadOnly = !this.falsePositiveReadOnly
+    },
+    updateFalsePositive(updatedValue) {
+      console.log("Call API-Update -> " + updatedValue.id)
+      console.log("New Value -> " + updatedValue.falsePositive.justification)
+      console.log("New Status -> " + updatedValue.falsePositive.isFalsePositive)
+      this.editFalsePositive()
     }
   }
 }
@@ -110,23 +121,58 @@ export default {
                   <v-col>{{scanResult.resultRaw.Fingerprint}}</v-col>
                   <v-col>{{scanResult.save_date}}</v-col>
                   <v-col>
-                    <v-icon v-if="!scanResult.falsePositive.isFalsePositive">mdi-check-circle-outline</v-icon>
-                    <v-icon v-else>mdi-alert-circle-outline</v-icon>
-                  </v-col>
-                  <v-col>
                         <v-btn><v-icon>mdi-details</v-icon> Show Raw Result
-                          <v-dialog v-model="rawResultDialog" activator="parent">
-                            <v-card>
+                          <v-dialog v-model="rawResultDialog" activator="parent" width="50%">
+                            <v-card >
                             <v-card-text>
                               <pre>{{scanResult.resultRaw}}</pre>
                             </v-card-text>
+                              <v-divider></v-divider>
                             <v-card-actions>
-                              <v-btn color="primary" block @click="rawResultDialog = false">Close Dialog</v-btn>
+                              <v-col class="text-right">
+                                <v-btn color="primary" @click="rawResultDialog = false">Close</v-btn>
+                              </v-col>
                             </v-card-actions>
                           </v-card>
                           </v-dialog>
                         </v-btn>
-
+                  </v-col>
+                  <v-col>
+                    <v-icon v-if="!scanResult.falsePositive.isFalsePositive">mdi-check-circle-outline</v-icon>
+                    <v-icon v-else>mdi-alert-circle-outline</v-icon>
+                  </v-col>
+                  <v-col>
+                    <v-btn><v-icon>mdi-details</v-icon> Set False-Positive
+                      <v-dialog v-model="falsePositiveDialog" activator="parent" width="500">
+                        <v-card >
+                          <v-card-item>
+                            <v-card-title>Status-Overview</v-card-title>
+                            <v-card-subtitle>Change Date: {{scanResult.falsePositive.change_date}}</v-card-subtitle>
+                            <v-card-text>
+                              <v-checkbox v-if="falsePositiveReadOnly === true" label="False-Positive" v-model="scanResult.falsePositive.isFalsePositive" disabled></v-checkbox>
+                              <v-checkbox v-else label="False-Positive" v-model="scanResult.falsePositive.isFalsePositive"></v-checkbox>
+                              <v-textarea
+                                :readonly="falsePositiveReadOnly"
+                                v-model="scanResult.falsePositive.justification"
+                                variant="underlined"
+                                no-resize
+                                rows="2"
+                                label="Reason for change"
+                              >
+                              </v-textarea>
+                            </v-card-text>
+                          </v-card-item>
+                          <v-divider></v-divider>
+                          <v-card-actions>
+                            <v-col class="text-right">
+                              <v-btn v-if="falsePositiveReadOnly === true"  color="primary" @click="editFalsePositive">Edit</v-btn>
+                              <v-btn v-else  color="primary" @click="updateFalsePositive({falsePositive: scanResult.falsePositive, id: scanResult.id})">Save</v-btn>
+                              <v-btn color="primary" @click="falsePositiveDialog = false">Close</v-btn>
+                            </v-col>
+                          </v-card-actions>
+                        </v-card>
+                      </v-dialog>
+                    </v-btn>
                   </v-col>
                 </v-row>
               </v-container>
@@ -155,4 +201,5 @@ export default {
 .list-item:hover {
   background-color: aliceblue;
 }
+
 </style>
