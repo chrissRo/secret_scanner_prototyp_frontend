@@ -117,15 +117,15 @@ export default {
             >
               <v-container fluid>
                 <v-row>
-                  <v-col>{{ scanResult.id }}</v-col>
-                  <v-col>{{scanResult.resultRaw.Fingerprint}}</v-col>
+                  <v-col>{{ scanResult.resultRaw.File }}</v-col>
+                  <v-col>{{scanResult.resultRaw.Match}}</v-col>
                   <v-col>{{scanResult.save_date}}</v-col>
                   <v-col>
                         <v-btn><v-icon>mdi-details</v-icon> Show Raw Result
                           <v-dialog v-model="rawResultDialog" activator="parent" width="50%">
                             <v-card >
                             <v-card-text>
-                              <pre>{{scanResult.resultRaw}}</pre>
+                              <pre style="white-space:pre-wrap;">{{scanResult.resultRaw}}</pre>
                             </v-card-text>
                               <v-divider></v-divider>
                             <v-card-actions>
@@ -138,11 +138,10 @@ export default {
                         </v-btn>
                   </v-col>
                   <v-col>
-                    <v-icon v-if="!scanResult.falsePositive.isFalsePositive">mdi-check-circle-outline</v-icon>
-                    <v-icon v-else>mdi-alert-circle-outline</v-icon>
-                  </v-col>
-                  <v-col>
-                    <v-btn><v-icon>mdi-details</v-icon> Set False-Positive
+                    <v-btn>
+                      <v-icon v-if="scanResult.falsePositive.isFalsePositive">mdi-check-circle-outline</v-icon>
+                      <v-icon v-else>mdi-alert-circle-outline</v-icon>
+                      Review Status
                       <v-dialog v-model="falsePositiveDialog" activator="parent" width="500">
                         <v-card >
                           <v-card-item>
