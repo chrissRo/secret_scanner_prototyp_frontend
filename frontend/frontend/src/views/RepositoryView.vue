@@ -46,6 +46,7 @@ export default {
       overviewElement: 'overview-element',
       listItem: 'list-item',
       findingsList: 'findings-list',
+      findingsListSearchBar: 'findings-list-search-bar',
       mockRepo: {
         id: 0,
         name: "Repo1",
@@ -59,6 +60,7 @@ export default {
       rawResultDialog: false,
       falsePositiveDialog: false,
       falsePositiveReadOnly: true,
+      searchInput: '',
       }
   },
   methods: {
@@ -78,6 +80,15 @@ export default {
       console.log("New Value -> " + updatedValue.falsePositive.justification)
       console.log("New Status -> " + updatedValue.falsePositive.isFalsePositive)
       this.editFalsePositive()
+    }
+  },
+  computed: {
+    filteredScanResults() {
+      if (this.searchInput) {
+        return this.mockScanResults.filter((result) => JSON.stringify(result).toLowerCase().includes(this.searchInput.toLowerCase()))
+      } else {
+        return this.mockScanResults
+      }
     }
   }
 }
@@ -108,10 +119,23 @@ export default {
 
     <div :class="findingsList">
     <h2>Findings List</h2>
+      <v-container :class="findingsListSearchBar" fluid>
+        <v-row >
+          <v-col/>
+          <v-col>
+              <v-text-field
+                clearable
+                label="Search"
+                prepend-icon="mdi-database-search"
+                v-model="searchInput"
+              ></v-text-field>
+          </v-col>
+        </v-row>
+      </v-container>
       <v-card class="mx-auto">
         <v-list>
             <v-list-item
-              v-for="scanResult in mockScanResults"
+              v-for="scanResult in filteredScanResults"
               :key="scanResult.id"
               :class="listItem"
             >
