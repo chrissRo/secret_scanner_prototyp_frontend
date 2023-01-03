@@ -109,7 +109,10 @@ export default {
                   <v-col>{{ scanResult.id }}</v-col>
                   <v-col>{{scanResult.resultRaw.Fingerprint}}</v-col>
                   <v-col>{{scanResult.save_date}}</v-col>
-                  <v-col><v-checkbox label="False-Positive"></v-checkbox></v-col>
+                  <v-col>
+                    <v-icon v-if="!scanResult.falsePositive.isFalsePositive">mdi-check-circle-outline</v-icon>
+                    <v-icon v-else>mdi-alert-circle-outline</v-icon>
+                  </v-col>
                   <v-col>
                         <v-btn><v-icon>mdi-details</v-icon> Show Raw Result
                           <v-dialog v-model="rawResultDialog" activator="parent">
