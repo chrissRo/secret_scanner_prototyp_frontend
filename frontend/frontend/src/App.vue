@@ -9,7 +9,7 @@ export default {
   },
   computed: {
     showTitleBar() {
-      const hideTitleBar = ['Login']
+      const hideTitleBar = ['Login', 'NotFoundView']
       return !hideTitleBar.includes(this.$route.name);
     }
   }

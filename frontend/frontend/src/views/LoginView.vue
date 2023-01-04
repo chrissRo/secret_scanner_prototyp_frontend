@@ -1,5 +1,12 @@
 <script>
+import {useTokenStore} from "@/store/token";
+
 export default {
+  setup() {
+    return {
+      tokenStore: useTokenStore()
+    }
+  },
   data() {
     return {
       disableLoginButton: false,
@@ -7,12 +14,22 @@ export default {
       form: false,
       username: '',
       password: '',
-      loginForm: 'login-form'
+      loginForm: 'login-form',
+      loginFailed: false,
+      snackbarTimeout: 1000,
     }
   },
   methods: {
-    login() {
+    async login() {
       console.log('Login ->' + this.username + ':' + this.password)
+      await this.tokenStore.signIn(this.username, this.password)
+      console.log('Token -> ' + this.tokenStore.token)
+      if(this.tokenStore.token) {
+        this.loginFailed = false
+        this.$router.push('/')
+      } else {
+        this.loginFailed = true
+      }
     }
   },
   computed: {
@@ -53,6 +70,11 @@ export default {
             <v-btn v-if="disableLoginButton" color="primary" disabled>Login</v-btn>
             <v-btn v-else color="primary" @click="login()" >Login</v-btn>
           </v-col>
+        </v-row>
+        <v-row>
+          <v-snackbar v-model="loginFailed" :timeout="snackbarTimeout" rounded="pill" color="primary">
+            Username or Password incorred. Please try again <v-icon>mdi-alert-circle</v-icon>
+          </v-snackbar>
         </v-row>
       </v-form>
     </v-card>

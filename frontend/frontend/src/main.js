@@ -7,21 +7,25 @@ import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
-
 import { createApp } from 'vue'
 import router from "@/router/index.js";
+
+// Plugins
+import { registerPlugins } from '@/plugins'
+import {createPinia} from "pinia";
+
+
 const vuetify = createVuetify({
   components,
   directives,
 })
 
-// Plugins
-import { registerPlugins } from '@/plugins'
-
+const pinia = createPinia();
 const app = createApp(App)
 
 registerPlugins(app)
 
 app.use(vuetify)
 app.use(router)
+app.use(pinia)
 app.mount('#app')
