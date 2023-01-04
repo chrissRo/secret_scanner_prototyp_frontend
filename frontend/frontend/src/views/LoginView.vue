@@ -2,6 +2,8 @@
 export default {
   data() {
     return {
+      disableLoginButton: false,
+      showPassword: false,
       form: false,
       username: '',
       password: '',
@@ -11,6 +13,11 @@ export default {
   methods: {
     login() {
       console.log('Login ->' + this.username + ':' + this.password)
+    }
+  },
+  computed: {
+    disableLoginButton() {
+      return this.username === '' || this.password === '';
     }
   }
 }
@@ -23,8 +30,9 @@ export default {
           <v-col>
             <v-text-field
               v-model="username"
-              label="Username"
+              label="Username*"
               required
+              append-icon="mdi-account-outline"
             ></v-text-field>
           </v-col>
         </v-row>
@@ -32,14 +40,18 @@ export default {
           <v-col>
             <v-text-field
               v-model="password"
-              label="Password"
+              label="Password*"
               required
+              :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="showPassword ? 'text' : 'password'"
+              @click:append="showPassword = !showPassword"
             ></v-text-field>
           </v-col>
         </v-row>
         <v-row>
           <v-col style="text-align: center">
-            <v-btn color="primary" @click="login()">Login</v-btn>
+            <v-btn v-if="disableLoginButton" color="primary" disabled>Login</v-btn>
+            <v-btn v-else color="primary" @click="login()" >Login</v-btn>
           </v-col>
         </v-row>
       </v-form>
