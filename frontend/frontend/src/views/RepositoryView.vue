@@ -94,7 +94,6 @@ export default {
 }
 </script>
 
-
 <template>
   <div :class="overviewBlock" >
     <h2>{{ mockScanResult.repositoryName }}</h2>

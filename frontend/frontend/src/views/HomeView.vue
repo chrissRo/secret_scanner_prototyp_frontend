@@ -1,7 +1,5 @@
 <script>
 
-import RepositoryView from "@/views/RepositoryView";
-
 export default {
   data() {
     const repoMockList =[
