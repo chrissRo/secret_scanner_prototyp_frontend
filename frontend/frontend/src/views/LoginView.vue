@@ -15,7 +15,7 @@ export default {
       password: '',
       loginForm: 'login-form',
       loginFailed: false,
-      snackbarTimeout: 1000,
+      snackbarTimeout: 3000,
     }
   },
   methods: {
@@ -26,16 +26,9 @@ export default {
       formData.append('username', this.username)
       formData.append('password', this.password)
 
-      let config = {
-        headers: {
-          'Access-Control-Allow-Origin': '*'
-        }
-      }
-
-      this.$axios.post('/token/', formData, config).then((r) => {
-        console.log(r)
-        console.log('Token -> ' + this.tokenStore.token)
-        if(this.tokenStore.token) {
+      this.$axios.post('/token/', formData).then((r) => {
+        if(r.data['access_token']) {
+          this.tokenStore.token = r.data['access_token']
           this.loginFailed = false
           this.$router.push('/')
         } else {
