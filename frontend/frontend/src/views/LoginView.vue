@@ -26,7 +26,13 @@ export default {
       formData.append('username', this.username)
       formData.append('password', this.password)
 
-      this.$axios.post('/token', formData).then((r) => {
+      let config = {
+        headers: {
+          'Access-Control-Allow-Origin': '*'
+        }
+      }
+
+      this.$axios.post('/token/', formData, config).then((r) => {
         console.log(r)
         console.log('Token -> ' + this.tokenStore.token)
         if(this.tokenStore.token) {
