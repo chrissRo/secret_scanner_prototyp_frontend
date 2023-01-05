@@ -21,14 +21,23 @@ export default {
   methods: {
     async login() {
       console.log('Login ->' + this.username + ':' + this.password)
-      await this.tokenStore.signIn(this.username, this.password)
-      console.log('Token -> ' + this.tokenStore.token)
-      if(this.tokenStore.token) {
-        this.loginFailed = false
-        this.$router.push('/')
-      } else {
-        this.loginFailed = true
-      }
+      // Todo api-call for login
+      let formData = new FormData()
+      formData.append('username', this.username)
+      formData.append('password', this.password)
+
+      this.$axios.post('/token', formData).then((r) => {
+        console.log(r)
+        console.log('Token -> ' + this.tokenStore.token)
+        if(this.tokenStore.token) {
+          this.loginFailed = false
+          this.$router.push('/')
+        } else {
+          this.loginFailed = true
+        }
+      }).catch((e) => {
+        console.log(e.toString())
+      })
     }
   },
   computed: {

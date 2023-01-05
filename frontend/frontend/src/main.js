@@ -13,6 +13,7 @@ import router from "@/router/index.js";
 // Plugins
 import { registerPlugins } from '@/plugins'
 import {createPinia} from "pinia";
+import axios from "axios";
 
 
 const vuetify = createVuetify({
@@ -22,6 +23,18 @@ const vuetify = createVuetify({
 
 const pinia = createPinia();
 const app = createApp(App)
+
+/*
+Axios Setup
+ */
+
+let axiosBase = axios.create({
+  baseURL: 'http://localhost:8000'
+})
+
+axiosBase.defaults.headers.common['Access-Control-Allow-Origin'] = 'http://localhost:8000'
+app.config.globalProperties.$axios = {...axiosBase}
+
 
 registerPlugins(app)
 
