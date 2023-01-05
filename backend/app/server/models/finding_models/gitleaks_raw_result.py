@@ -17,7 +17,7 @@ class GitleaksRawResultModel(RawResultModel):
     Commit: str = Field(...)
     Entropy: PositiveFloat = Field(...)
     Author: str = Field(...)
-    Email: EmailStr = Field(...)
+    Email: str = Field(...)
     Date: datetime = Field(...)
     Message: str = Field(...)
     Tags: list[str] = Field(...)
