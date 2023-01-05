@@ -1,11 +1,9 @@
 <script>
 import TitleBar from '@/components/TitleBar.vue'
-import BreadcrumbBar from '@/components/BreadcrumbBar.vue'
 export default {
 
   components: {
     TitleBar,
-    BreadcrumbBar
   },
   computed: {
     showTitleBar() {

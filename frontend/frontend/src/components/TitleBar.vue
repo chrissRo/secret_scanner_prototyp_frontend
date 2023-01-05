@@ -1,9 +1,23 @@
 <script>
+import {useTokenStore} from "@/store/token";
+
 export default {
+  setup() {
+    return {
+      tokenStore: useTokenStore()
+    }
+  },
   data() {
     return {
       navigationButtonGroup: 'navigation-button-group',
       navigationButton: 'navigation-button'
+    }
+  },
+  methods: {
+    logout() {
+      localStorage.removeItem(this.tokenStore.token)
+      this.tokenStore.token = null
+      this.$router.push('/login')
     }
   }
 }
@@ -19,7 +33,7 @@ export default {
       <v-btn :class="navigationButton" variant="tonal" color="info">Todo: Import/Export</v-btn>
       <v-btn :class="navigationButton" variant="tonal" color="info">Repositories-View</v-btn>
       <v-btn :class="navigationButton" variant="tonal" color="info">Files-View</v-btn>
-      <v-btn :class="navigationButton" variant="tonal" color="success">Logout</v-btn>
+      <v-btn :class="navigationButton" variant="tonal" color="primary" @click="logout" >Logout</v-btn>
     </div>
   </v-toolbar>
 </template>
