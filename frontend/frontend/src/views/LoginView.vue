@@ -9,7 +9,6 @@ export default {
   },
   data() {
     return {
-      disableLoginButton: false,
       showPassword: false,
       form: false,
       username: '',

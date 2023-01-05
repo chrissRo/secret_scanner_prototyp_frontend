@@ -12,6 +12,10 @@ export const useTokenStore = defineStore({
       if(username === 'testUser' && password === 'testPassword!'){
         this.token = 'abcd123abcd123';
       }
+    },
+    signOut() {
+      localStorage.removeItem(this.token)
+      this.token = null
     }
   }
 })
