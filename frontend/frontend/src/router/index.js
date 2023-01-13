@@ -40,12 +40,12 @@ router.beforeEach((to, from, next) => {
 
   const authRequired = !publicPages.includes((to.path))
   const loggedIn = useTokenStore().token
-  console.log("beforeEach -> " + loggedIn)
 
   if (authRequired && !loggedIn) {
     next('/login')
   } else if(to.path === '/login' && loggedIn ){
     next('/')
+
   } else {
     next()
   }
