@@ -42,7 +42,6 @@ router.beforeEach((to, from, next) => {
   const loggedIn = useTokenStore().token
   console.log("beforeEach -> " + loggedIn)
 
-
   if (authRequired && !loggedIn) {
     next('/login')
   } else if(to.path === '/login' && loggedIn ){
