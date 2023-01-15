@@ -25,6 +25,7 @@ export default {
       repositoryList: [],
       repositoryList_2: [],
       listItem: 'list-item',
+      listHeader: 'list-header',
       searchRepo: null,
       overviewData: {},
     }
@@ -81,7 +82,7 @@ export default {
 
 <template>
   <div :class="overviewBlock" >
-  <h2>Overview</h2>
+  <div class="text-h5">Overview</div>
     <v-container>
       <v-row no-gutters :class="overviewElements" v-model="overviewData">
           <v-col :class="overviewElement">
@@ -101,7 +102,7 @@ export default {
   </div>
 
     <div :class="repoList">
-      <h2>Repository List</h2>
+      <div class="text-h5">Repository List</div>
       <v-container :class="repoSearchBar" fluid>
         <v-row >
           <v-col/>
@@ -119,29 +120,35 @@ export default {
             </div>
           </v-col>
         </v-row>
-      </v-container>
+      </v-container >
+
       <v-card class="mx-auto" >
+        <v-container fluid>
         <v-list>
-          <v-row>
-            <v-col>
-              RepoName
-              <v-divider/>
-            </v-col>
-            <v-col>
-              LastScan
-              <v-divider/>
-            </v-col>
-            <v-list-item>
-              Details
-              <v-divider/>
-            </v-list-item>
-          </v-row>
+          <v-list-item >
+            <v-row :class="listHeader" class="text-h6">
+              <v-col>
+                Repository Name
+              </v-col>
+              <v-col>
+                Scanner Information
+              </v-col>
+              <v-col>
+                Date and time of last scan
+              </v-col>
+              <v-col>
+                Number of scan-results
+              </v-col>
+              <v-col style="text-align: right;">
+                Details
+              </v-col>
+            </v-row>
+            <v-divider/>
+          </v-list-item>
         <v-list-item
           v-for="repo in searchRepoList"
           :key="repo._id"
-          :class="listItem"
-        >
-          <v-container fluid>
+          :class="listItem">
             <v-row >
               <v-col>
                 {{ repo.repositoryName }}
@@ -155,7 +162,7 @@ export default {
               <v-col>
                 {{getDocumentCountForRepo(repo.repositoryName)}}
               </v-col>
-              <v-col v-if="repo.repositoryPath != '.'" style="text-align: right">
+              <v-col v-if="repo.repositoryPath != '.'" style="text-align: right;">
                 Manual Import
                 <router-link :to="{name: 'RepositoryView', params: {id: repo._id} }"
                              v-slot="{navigate}"
@@ -165,7 +172,7 @@ export default {
                   </v-btn>
                 </router-link>
               </v-col>
-              <v-col v-else style="text-align: right">
+              <v-col v-else style="text-align: right;">
                 <v-btn href="https://gitlab.com" color="primary">
                   <v-icon>mdi-gitlab</v-icon>
                 </v-btn>
@@ -178,11 +185,9 @@ export default {
                 </router-link>
               </v-col>
             </v-row>
-          </v-container>
-          <v-divider></v-divider>
         </v-list-item>
-
         </v-list>
+        </v-container>
       </v-card>
     </div>
 
@@ -203,6 +208,14 @@ export default {
 
 .overview-element {
   margin: 0.25em
+}
+
+.list-header {
+  margin:auto
+}
+
+.list-item {
+  margin: auto
 }
 
 .list-item:hover {
