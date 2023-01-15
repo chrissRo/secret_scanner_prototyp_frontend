@@ -1,6 +1,8 @@
 <script>
 
 import {useTokenStore} from "@/store/token";
+import moment from "moment";
+import scannerType from "@/api/apiModel";
 
 export default {
   setup() {
@@ -32,8 +34,8 @@ export default {
       this.$axios.defaults.headers.Authorization = `Bearer ${this.tokenStore.token}`
       this.$axios.get('/finding/count').then((res) => {
         this.overviewData = {
-          documentsAmount: res.data['data']['total_number_of_documents'],
-          reposAmount: res.data['data']['total_number_of_distinct_repos'],
+          documentsAmount: String(res.data['data']['total_number_of_documents']),
+          reposAmount: String(res.data['data']['total_number_of_distinct_repos']),
         }
         // eslint-disable-next-line no-unused-vars
       }).catch((err) => {/*pass to global error handler*/})
@@ -45,6 +47,17 @@ export default {
       }).catch((err) => {
         console.log(err)
       })
+    },
+    formatScanDate(scanDateTime){
+      return moment(String(scanDateTime)).format('MMMM Do YYYY, HH:mm:ss')
+    },
+    getScannerString(type, version){
+      switch (type) {
+        case scannerType.Gitleaks:
+          return 'Gitleaks ' + version
+        default:
+          return 'Unknown Scanner'
+      }
     }
   },
   computed: {
@@ -112,7 +125,7 @@ export default {
               <v-divider/>
             </v-col>
             <v-list-item>
-              Go To
+              Details
               <v-divider/>
             </v-list-item>
           </v-row>
@@ -127,17 +140,38 @@ export default {
                 {{ repo.repositoryName }}
               </v-col>
               <v-col>
-                {{ repo.scanEndTime }}
+                {{ getScannerString(repo.scannerType, repo.scannerVersion)}}
               </v-col>
               <v-col>
-                <router-link :to="{name: 'RepositoryView', params: {id: repo._id} }"
-                             v-slot="{navigate}">
-                  <v-btn @click="navigate" color="primary" role="link">Go to {{ repo.repositoryName}}</v-btn>
-                </router-link>
+                {{ formatScanDate(repo.scanEndTime) }}
               </v-col>
+                  <v-col v-if="repo.repositoryPath != '.'" style="text-align: right">
+                    Manual Import
+                    <router-link :to="{name: 'RepositoryView', params: {id: repo._id} }"
+                                 v-slot="{navigate}"
+                                 style="margin-left: 1em">
+                      <v-btn @click="navigate" color="primary" role="link">
+                        <v-icon>mdi-pencil-box-multiple-outline</v-icon>
+                      </v-btn>
+                    </router-link>
+                  </v-col>
+                  <v-col v-else style="text-align: right">
+                    <v-btn href="https://gitlab.com" color="primary">
+                      <v-icon>mdi-gitlab</v-icon>
+                    </v-btn>
+                    <router-link :to="{name: 'RepositoryView', params: {id: repo._id} }"
+                                 v-slot="{navigate}"
+                                 style="margin-left: 1em">
+                      <v-btn @click="navigate" color="primary" role="link">
+                        <v-icon>mdi-pencil-box-multiple-outline</v-icon>
+                      </v-btn>
+                    </router-link>
+                  </v-col>
             </v-row>
           </v-container>
+          <v-divider></v-divider>
         </v-list-item>
+
         </v-list>
       </v-card>
     </div>
