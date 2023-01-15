@@ -3,6 +3,7 @@
 import {useTokenStore} from "@/store/token";
 import moment from "moment";
 import scannerType from "@/api/apiModel";
+import {toRaw} from "vue";
 
 export default {
   setup() {
@@ -25,7 +26,7 @@ export default {
       repositoryList_2: [],
       listItem: 'list-item',
       searchRepo: null,
-      overviewData: {}
+      overviewData: {},
     }
   },
   methods: {
@@ -33,9 +34,11 @@ export default {
 
       this.$axios.defaults.headers.Authorization = `Bearer ${this.tokenStore.token}`
       this.$axios.get('/finding/count').then((res) => {
+
         this.overviewData = {
           documentsAmount: String(res.data['data']['total_number_of_documents']),
           reposAmount: String(res.data['data']['total_number_of_distinct_repos']),
+          documentsPerRepository: res.data['data']['documents_per_repository']
         }
         // eslint-disable-next-line no-unused-vars
       }).catch((err) => {/*pass to global error handler*/})
@@ -58,6 +61,10 @@ export default {
         default:
           return 'Unknown Scanner'
       }
+    },
+    getDocumentCountForRepo(repoName){
+      let data = this.overviewData.documentsPerRepository.filter((r) => r['_id'] === repoName)
+      return data[0]['count']
     }
   },
   computed: {
@@ -145,28 +152,31 @@ export default {
               <v-col>
                 {{ formatScanDate(repo.scanEndTime) }}
               </v-col>
-                  <v-col v-if="repo.repositoryPath != '.'" style="text-align: right">
-                    Manual Import
-                    <router-link :to="{name: 'RepositoryView', params: {id: repo._id} }"
-                                 v-slot="{navigate}"
-                                 style="margin-left: 1em">
-                      <v-btn @click="navigate" color="primary" role="link">
-                        <v-icon>mdi-pencil-box-multiple-outline</v-icon>
-                      </v-btn>
-                    </router-link>
-                  </v-col>
-                  <v-col v-else style="text-align: right">
-                    <v-btn href="https://gitlab.com" color="primary">
-                      <v-icon>mdi-gitlab</v-icon>
-                    </v-btn>
-                    <router-link :to="{name: 'RepositoryView', params: {id: repo._id} }"
-                                 v-slot="{navigate}"
-                                 style="margin-left: 1em">
-                      <v-btn @click="navigate" color="primary" role="link">
-                        <v-icon>mdi-pencil-box-multiple-outline</v-icon>
-                      </v-btn>
-                    </router-link>
-                  </v-col>
+              <v-col>
+                {{getDocumentCountForRepo(repo.repositoryName)}}
+              </v-col>
+              <v-col v-if="repo.repositoryPath != '.'" style="text-align: right">
+                Manual Import
+                <router-link :to="{name: 'RepositoryView', params: {id: repo._id} }"
+                             v-slot="{navigate}"
+                             style="margin-left: 1em">
+                  <v-btn @click="navigate" color="primary" role="link">
+                    <v-icon>mdi-pencil-box-multiple-outline</v-icon>
+                  </v-btn>
+                </router-link>
+              </v-col>
+              <v-col v-else style="text-align: right">
+                <v-btn href="https://gitlab.com" color="primary">
+                  <v-icon>mdi-gitlab</v-icon>
+                </v-btn>
+                <router-link :to="{name: 'RepositoryView', params: {id: repo._id} }"
+                             v-slot="{navigate}"
+                             style="margin-left: 1em">
+                  <v-btn @click="navigate" color="primary" role="link">
+                    <v-icon>mdi-pencil-box-multiple-outline</v-icon>
+                  </v-btn>
+                </router-link>
+              </v-col>
             </v-row>
           </v-container>
           <v-divider></v-divider>
