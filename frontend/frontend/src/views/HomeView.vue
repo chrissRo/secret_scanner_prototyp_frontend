@@ -23,7 +23,6 @@ export default {
       repoList: 'repo-list',
       repoSearchBar: 'repo-search-bar',
       repositoryList: [],
-      repositoryList_2: [],
       listItem: 'list-item',
       listHeader: 'list-header',
       searchRepo: null,
