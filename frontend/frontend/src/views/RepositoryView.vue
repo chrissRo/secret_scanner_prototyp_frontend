@@ -1,7 +1,21 @@
 <script>
 
+import {useTokenStore} from "@/store/token";
+import moment from "moment/moment";
+
 export default {
-  props: ['id'],
+  setup() {
+    return {
+      tokenStore: useTokenStore()
+    }
+  },
+  created() {
+    this.getOverviewData()
+  },
+  props: {
+    id: String,
+    lastScan: String
+  },
 
   data() {
     let mockScanResult= {
@@ -41,6 +55,7 @@ export default {
     }
 
     return {
+      headerBlock: 'header-block',
       overviewBlock: 'overview-block',
       overviewElementContainer: 'overview-element-container',
       overviewElement: 'overview-element',
@@ -61,16 +76,23 @@ export default {
       falsePositiveDialog: false,
       falsePositiveReadOnly: true,
       searchInput: '',
+      overviewData: {}
       }
   },
   methods: {
-    getAdditionalRepoData(repoID) {
-      return {
-        lastScan: this.mockRepo.lastScan,
-        findingsAmount: this.mockRepo.findingsAmount,
-        falsePositivesAmount: this.mockRepo.falsePositivesAmount,
-        toReviewAmount: this.mockRepo.toReviewAmount
-      }
+    async getOverviewData() {
+      this.$axios.defaults.headers.Authorization = `Bearer ${this.tokenStore.token}`
+      this.$axios.get(`/finding/repository/${this.id}/count/`).then((res) => {
+        console.log(res.data)
+        this.overviewData = {
+          documentsAmount: String(res.data['data']['total_number_of_documents']),
+          falsePositivesAmount: String(res.data['data']['total_number_of_false_positives']),
+          truePositivesAmount: String(res.data['data']['total_number_of_true_positives']),
+          toReviewAmount: String(res.data['data']['total_number_of_todos']),
+          lastScanData: this.lastScan
+        }
+        // eslint-disable-next-line no-unused-vars
+      }).catch((err) => {/*pass to global error handler*/})
     },
     editFalsePositive() {
       this.falsePositiveReadOnly = !this.falsePositiveReadOnly
@@ -80,6 +102,9 @@ export default {
       console.log("New Value -> " + updatedValue.falsePositive.justification)
       console.log("New Status -> " + updatedValue.falsePositive.isFalsePositive)
       this.editFalsePositive()
+    },
+    formatScanDate(scanDateTime){
+      return moment(String(scanDateTime)).format('MMMM Do YYYY, HH:mm:ss')
     }
   },
   computed: {
@@ -95,29 +120,42 @@ export default {
 </script>
 
 <template>
+  <v-toolbar color="primary" :class="headerBlock" density="compact">
+    <v-toolbar-title class="text-overline">{{ 'Repository: ' + id }}</v-toolbar-title>
+  </v-toolbar>
   <div :class="overviewBlock" >
-    <h2>{{ mockScanResult.repositoryName }}</h2>
+    <v-toolbar color="primary">
+      <v-toolbar-title class="text-h5">Overview</v-toolbar-title>
+    </v-toolbar>
+
     <v-container :class="overviewElementContainer" fluid>
-      <v-row no-gutters :class="overviewElement">
-        <v-col>
-          <v-card title="#Repos" :text="getAdditionalRepoData().findingsAmount"></v-card>
+      <v-row no-gutters :class="overviewElement" v-model="overviewData">
+        <v-col :class="overviewElement">
+          <v-card title="Documents" subtitle="total" :text="overviewData.documentsAmount"></v-card>
         </v-col>
-        <v-col>
-          <v-card title="#Falsch-Positive" :text="getAdditionalRepoData().falsePositivesAmount"></v-card>
+        <v-col :class="overviewElement">
+          <v-card title="False-Positives" subtitle="total" :text="overviewData.falsePositivesAmount"></v-card>
         </v-col>
-        <v-col>
-          <v-card title="#Findings-To-Review" :text="getAdditionalRepoData().toReviewAmount"></v-card>
+        <v-col :class="overviewElement">
+          <v-card title="True-Positives" subtitle="total" :text="overviewData.truePositivesAmount"></v-card>
         </v-col>
-        <v-col>
-          <v-card title="LastScan" :text="getAdditionalRepoData().lastScan">
-          </v-card>
+        <v-col :class="overviewElement">
+          <v-card title="To-Review" subtitle="total" :text="overviewData.toReviewAmount"></v-card>
+        </v-col>
+        <v-col :class="overviewElement">
+          <v-card title="Date of Last Scan" subtitle="Timestamp" :text="formatScanDate(lastScan)"></v-card>
         </v-col>
       </v-row>
     </v-container>
-  </div>
 
-    <div :class="findingsList">
-    <h2>Findings List</h2>
+  </div>
+  <v-divider inset></v-divider>
+
+
+  <div :class="findingsList">
+    <v-toolbar color="primary">
+      <v-toolbar-title class="text-h5">Findings List</v-toolbar-title>
+    </v-toolbar>
       <v-container :class="findingsListSearchBar" fluid>
         <v-row >
           <v-col/>
@@ -203,17 +241,20 @@ export default {
       </v-card>
     </div>
 
-
-
 </template>
 
 <style>
+
+.header-block {
+
+}
+
 .overview-block {
   margin: 3em;
 }
 
 .overview-element {
-  margin: 2em
+  margin: 0.25em
 }
 
 .findings-list {
