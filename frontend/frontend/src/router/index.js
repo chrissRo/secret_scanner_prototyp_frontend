@@ -17,7 +17,7 @@ const routes = [
     component: LoginView
   },
   {
-    path: '/repository-view/:id',
+    path: '/repository-view/:id/:lastScan',
     name: 'RepositoryView',
     component: RepositoryView,
     props: true,
