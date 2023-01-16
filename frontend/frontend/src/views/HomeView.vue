@@ -3,7 +3,6 @@
 import {useTokenStore} from "@/store/token";
 import moment from "moment";
 import scannerType from "@/api/apiModel";
-import {toRaw} from "vue";
 
 export default {
   setup() {
@@ -18,6 +17,7 @@ export default {
   data() {
     return {
       overviewBlock: 'overview-block',
+      overviewElementContainer: 'overview-element-container',
       overviewElements: 'overview-elements',
       overviewElement: 'overview-element',
       repoList: 'repo-list',
@@ -32,10 +32,8 @@ export default {
   },
   methods: {
     async getOverviewData() {
-
       this.$axios.defaults.headers.Authorization = `Bearer ${this.tokenStore.token}`
       this.$axios.get('/finding/count').then((res) => {
-
         this.overviewData = {
           documentsAmount: String(res.data['data']['total_number_of_documents']),
           reposAmount: String(res.data['data']['total_number_of_distinct_repos']),
@@ -82,8 +80,12 @@ export default {
 
 <template>
   <div :class="overviewBlock" >
-  <div class="text-h5">Overview</div>
-    <v-container>
+    <v-toolbar color="primary">
+      <v-toolbar-title class="text-h5">Overview</v-toolbar-title>
+    </v-toolbar>
+
+
+    <v-container :class="overviewElementContainer" fluid>
       <v-row no-gutters :class="overviewElements" v-model="overviewData">
           <v-col :class="overviewElement">
             <v-card title="Documents" subtitle="total" :text="overviewData.documentsAmount"></v-card>
@@ -92,17 +94,22 @@ export default {
           <v-card title="Repositories" subtitle="total" :text="overviewData.reposAmount"></v-card>
         </v-col>
         <v-col :class="overviewElement">
-          <v-card title="Falsch-Positive" subtitle="total" :text="'Todo'"></v-card>
+          <v-card title="False-Positives" subtitle="total" :text="'Todo'"></v-card>
         </v-col>
         <v-col :class="overviewElement">
           <v-card title="Weitere Infos auf 1 Blick" subtitle="total" text="yolo"></v-card>
         </v-col>
       </v-row>
     </v-container>
-  </div>
 
-    <div :class="repoList">
-      <div class="text-h5">Repository List</div>
+
+  </div>
+  <v-divider inset></v-divider>
+
+  <div :class="repoList">
+    <v-toolbar color="primary">
+      <v-toolbar-title class="text-h5">Repository List</v-toolbar-title>
+    </v-toolbar>
       <v-container :class="repoSearchBar" fluid>
         <v-row >
           <v-col/>
@@ -164,7 +171,7 @@ export default {
               </v-col>
               <v-col v-if="repo.repositoryPath != '.'" style="text-align: right;">
                 Manual Import
-                <router-link :to="{name: 'RepositoryView', params: {id: repo._id} }"
+                <router-link :to="{name: 'RepositoryView', params: {id: repo._id, lastScan: repo.scanEndTime}}"
                              v-slot="{navigate}"
                              style="margin-left: 1em">
                   <v-btn @click="navigate" color="primary" role="link">
@@ -173,10 +180,10 @@ export default {
                 </router-link>
               </v-col>
               <v-col v-else style="text-align: right;">
-                <v-btn href="https://gitlab.com" color="primary">
+                <v-btn href="https://gitlab.com/TODO" color="primary">
                   <v-icon>mdi-gitlab</v-icon>
                 </v-btn>
-                <router-link :to="{name: 'RepositoryView', params: {id: repo._id} }"
+                <router-link :to="{name: 'RepositoryView', params: {id: repo.repositoryName, lastScan: repo.scanEndTime}}"
                              v-slot="{navigate}"
                              style="margin-left: 1em">
                   <v-btn @click="navigate" color="primary" role="link">
