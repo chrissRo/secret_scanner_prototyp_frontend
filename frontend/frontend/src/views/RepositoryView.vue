@@ -23,6 +23,7 @@ export default {
       overviewBlock: 'overview-block',
       overviewElementContainer: 'overview-element-container',
       overviewElement: 'overview-element',
+      listHeader: 'list-header',
       listItem: 'list-item',
       findingsListContainer: 'findings-list-container',
       findingsListSearchBar: 'findings-list-search-bar',
@@ -116,7 +117,9 @@ export default {
       <v-toolbar-title class="text-h5">Findings List</v-toolbar-title>
     </v-toolbar>
       <v-container :class="findingsListSearchBar" fluid>
-        <v-row >
+        <v-row>
+          <v-col/>
+          <v-col/>
           <v-col/>
           <v-col>
               <v-text-field
@@ -129,21 +132,43 @@ export default {
         </v-row>
       </v-container>
       <v-card class="mx-auto">
+        <v-container fluid>
         <v-list>
+          <v-list-item >
+            <v-row :class="listHeader" class="text-h6">
+              <v-col>
+                File Name
+              </v-col>
+              <v-col>
+                Match
+              </v-col>
+              <v-col>
+                Date and time of scan
+              </v-col>
+              <v-col style="text-align: right;">
+                Details
+              </v-col>
+            </v-row>
+            <v-divider/>
+          </v-list-item>
             <v-list-item
               v-for="(scanResult, index) in filteredFindingsList"
               :key="scanResult._id"
               :class="listItem"
             >
-              <v-container fluid>
                 <v-row>
-                  <v-col>{{scanResult.resultRaw.File}}</v-col>
+                  <v-col>
+                    <span>
+                      {{scanResult.resultRaw.File.split('\\').pop().split('/').pop()}}
+                    <v-tooltip :text="scanResult.resultRaw.File" location="right" activator="parent"></v-tooltip>
+                    </span>
+                  </v-col>
                   <v-col>{{scanResult.resultRaw.Match}}</v-col>
                   <v-col>{{scanResult.save_date}}</v-col>
-                  <v-col>
+                  <v-col style="text-align: right">
                     <v-dialog v-model="rawResultDialog[index]" width="50%">
                       <template v-slot:activator="{props}">
-                        <v-btn v-bind="props"><v-icon>mdi-details</v-icon> Show Raw Result</v-btn>
+                        <v-btn v-bind="props" color="primary"><v-icon>mdi-details</v-icon> Show Raw Result</v-btn>
                       </template>
                       <v-card >
                         <v-card-text>
@@ -157,10 +182,7 @@ export default {
                         </v-card-actions>
                       </v-card>
                     </v-dialog>
-
-                  </v-col>
-                  <v-col>
-                    <v-btn>
+                    <v-btn color="primary" style="margin-left: 1em">
                       <v-icon v-if="scanResult.falsePositive.isFalsePositive">mdi-check-circle-outline</v-icon>
                       <v-icon v-else>mdi-alert-circle-outline</v-icon>
                       Review Status
@@ -196,9 +218,10 @@ export default {
                     </v-btn>
                   </v-col>
                 </v-row>
-              </v-container>
+
             </v-list-item>
         </v-list>
+        </v-container>
       </v-card>
     </div>
 
@@ -222,8 +245,17 @@ export default {
   margin: 3em;
 }
 
+.list-header {
+  margin: auto
+}
+
 .list-item:hover {
   background-color: aliceblue;
+}
+
+.findings-list-search-bar {
+  width: 100%;
+  justify-content: flex-end
 }
 
 </style>

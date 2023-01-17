@@ -112,8 +112,9 @@ export default {
       <v-container :class="repoSearchBar" fluid>
         <v-row >
           <v-col/>
+          <v-col/>
+          <v-col/>
           <v-col>
-            <div>
               <v-autocomplete
                 :items="repositoryList"
                 v-model="searchRepo"
@@ -123,7 +124,6 @@ export default {
                 clearable
                 return-object
               />
-            </div>
           </v-col>
         </v-row>
       </v-container >
