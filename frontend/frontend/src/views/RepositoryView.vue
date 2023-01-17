@@ -29,7 +29,7 @@ export default {
       findingsListSearchBar: 'findings-list-search-bar',
       findingsList: [],
       rawResultDialog: [],
-      falsePositiveDialog: false, // TODO fix like rawResultDialog
+      falsePositiveDialog: [], // TODO fix like rawResultDialog
       falsePositiveReadOnly: true,
       searchInput: '',
       overviewData: {}
@@ -166,6 +166,7 @@ export default {
                   <v-col>{{scanResult.resultRaw.Match}}</v-col>
                   <v-col>{{scanResult.save_date}}</v-col>
                   <v-col style="text-align: right">
+
                     <v-dialog v-model="rawResultDialog[index]" width="50%">
                       <template v-slot:activator="{props}">
                         <v-btn v-bind="props" color="primary"><v-icon>mdi-details</v-icon> Show Raw Result</v-btn>
@@ -182,43 +183,41 @@ export default {
                         </v-card-actions>
                       </v-card>
                     </v-dialog>
-                    <v-btn color="primary" style="margin-left: 1em">
-                      <v-icon v-if="scanResult.falsePositive.isFalsePositive">mdi-check-circle-outline</v-icon>
-                      <v-icon v-else>mdi-alert-circle-outline</v-icon>
-                      Review Status
-                      <v-dialog v-model="falsePositiveDialog" activator="parent" width="500">
-                        <v-card >
-                          <v-card-item>
-                            <v-card-title>Status-Overview</v-card-title>
-                            <v-card-subtitle>Change Date: {{scanResult.falsePositive.change_date}}</v-card-subtitle>
-                            <v-card-text>
-                              <v-checkbox v-if="falsePositiveReadOnly === true" label="False-Positive" v-model="scanResult.falsePositive.isFalsePositive" disabled></v-checkbox>
-                              <v-checkbox v-else label="False-Positive" v-model="scanResult.falsePositive.isFalsePositive"></v-checkbox>
-                              <v-textarea
-                                :readonly="falsePositiveReadOnly"
-                                v-model="scanResult.falsePositive.justification"
-                                variant="underlined"
-                                no-resize
-                                rows="2"
-                                label="Reason for change"
-                              >
-                              </v-textarea>
-                            </v-card-text>
-                          </v-card-item>
-                          <v-divider></v-divider>
-                          <v-card-actions>
-                            <v-col class="text-right">
-                              <v-btn v-if="falsePositiveReadOnly === true" color="primary" @click="editFalsePositive">Edit</v-btn>
-                              <v-btn v-else  color="primary" @click="updateFalsePositive({falsePositive: scanResult.falsePositive, id: scanResult.id})">Save</v-btn>
-                              <v-btn color="primary" @click="falsePositiveDialog = false">Close</v-btn>
-                            </v-col>
-                          </v-card-actions>
-                        </v-card>
-                      </v-dialog>
-                    </v-btn>
+
+                    <v-dialog v-model="falsePositiveDialog[index]" width="500">
+                    <template v-slot:activator="{props}">
+                      <v-btn v-bind="props" color="primary" style="margin-left: 1em"><v-icon>mdi-pencil-outline</v-icon>Review Status</v-btn>
+                    </template>
+                      <v-card >
+                        <v-card-item>
+                          <v-card-title>Status-Overview</v-card-title>
+                          <v-card-subtitle>Change Date: {{scanResult.falsePositive.change_date}}</v-card-subtitle>
+                          <v-card-text>
+                            <v-checkbox v-if="falsePositiveReadOnly === true" label="False-Positive" v-model="scanResult.falsePositive.isFalsePositive" disabled></v-checkbox>
+                            <v-checkbox v-else label="False-Positive" v-model="scanResult.falsePositive.isFalsePositive"></v-checkbox>
+                            <v-textarea
+                              :readonly="falsePositiveReadOnly"
+                              v-model="scanResult.falsePositive.justification"
+                              variant="underlined"
+                              no-resize
+                              rows="2"
+                              label="Reason for change"
+                            >
+                            </v-textarea>
+                          </v-card-text>
+                        </v-card-item>
+                        <v-divider></v-divider>
+                        <v-card-actions>
+                          <v-col class="text-right">
+                            <v-btn v-if="falsePositiveReadOnly === true" color="primary" @click="editFalsePositive">Edit</v-btn>
+                            <v-btn v-else  color="primary" @click="updateFalsePositive({falsePositive: scanResult.falsePositive, id: scanResult.id})">Save</v-btn>
+                            <v-btn color="primary" @click="falsePositiveDialog[index] = false">Close</v-btn>
+                          </v-col>
+                        </v-card-actions>
+                      </v-card>
+                    </v-dialog>
                   </v-col>
                 </v-row>
-
             </v-list-item>
         </v-list>
         </v-container>
@@ -254,7 +253,6 @@ export default {
 }
 
 .findings-list-search-bar {
-  width: 100%;
   justify-content: flex-end
 }
 
