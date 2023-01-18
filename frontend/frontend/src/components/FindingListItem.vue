@@ -21,6 +21,7 @@ export default {
       rawResultDialog: false,
       falsePositiveDialog: false,
       falsePositiveReadOnly: true,
+      listItem: 'list-item',
     }
   },
   methods: {
@@ -42,20 +43,19 @@ export default {
 </script>
 
 <template>
-  <v-row>
+  <v-row :class="listItem">
     <v-col>
       <span>
         {{findingData.resultRaw.File.split('\\').pop().split('/').pop()}}
       <v-tooltip :text="findingData.resultRaw.File" location="right" activator="parent"></v-tooltip>
       </span>
     </v-col>
-    <v-col>{{findingData.resultRaw.Match}}</v-col>
+    <v-col><pre style="white-space:pre-wrap;" >{{findingData.resultRaw.Match}}</pre> </v-col>
     <v-col>{{formatScanDate(findingData.save_date)}}</v-col>
     <v-col style="text-align: right">
-
       <v-dialog v-model="rawResultDialog" width="50%">
         <template v-slot:activator="{props}">
-          <v-btn v-bind="props" color="primary"><v-icon>mdi-details</v-icon> Show Raw Result</v-btn>
+          <v-btn v-bind="props" color="primary"><v-icon>mdi-details</v-icon> Raw </v-btn>
         </template>
         <v-card >
           <v-card-text>
@@ -71,7 +71,7 @@ export default {
       </v-dialog>
       <v-dialog v-model="falsePositiveDialog" width="500">
         <template v-slot:activator="{props}">
-          <v-btn v-bind="props" color="primary" style="margin-left: 1em"><v-icon>mdi-pencil-outline</v-icon>Review Status</v-btn>
+          <v-btn v-bind="props" color="primary" style="margin-left: 1em"><v-icon>mdi-pencil-outline</v-icon> Status</v-btn>
         </template>
         <v-card >
           <v-card-item>
@@ -105,3 +105,14 @@ export default {
   </v-row>
 
 </template>
+
+<style>
+
+.list-item {
+  margin: auto
+}
+
+.list-item:hover {
+  background-color: aliceblue;
+}
+</style>
