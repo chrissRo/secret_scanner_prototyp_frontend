@@ -2,20 +2,24 @@
 
 import {useTokenStore} from "@/store/token";
 import moment from "moment/moment";
+import FindingListItem from "@/components/FindingListItem";
 
 export default {
   setup() {
     return {
-      tokenStore: useTokenStore()
+      tokenStore: useTokenStore(),
     }
   },
   created() {
-    this.getOverviewData()
-    this.getFindingsList()
+      this.getOverviewData()
+      this.getFindingsList()
   },
   props: {
     id: String,
     lastScan: String
+  },
+  components:{
+    FindingListItem
   },
   data() {
     return {
@@ -28,17 +32,15 @@ export default {
       findingsListContainer: 'findings-list-container',
       findingsListSearchBar: 'findings-list-search-bar',
       findingsList: [],
-      rawResultDialog: [],
-      falsePositiveDialog: [], // TODO fix like rawResultDialog
-      falsePositiveReadOnly: true,
       searchInput: '',
-      overviewData: {}
+      overviewData: {},
+      loadingFindings: true,
       }
   },
   methods: {
     async getOverviewData() {
       this.$axios.defaults.headers.Authorization = `Bearer ${this.tokenStore.token}`
-      this.$axios.get(`/finding/repository/${this.id}/count/`).then((res) => {
+      this.$axios.get(`/finding/repository/${this.id}/count`).then((res) => {
         this.overviewData = {
           documentsAmount: String(res.data['data']['total_number_of_documents']),
           falsePositivesAmount: String(res.data['data']['total_number_of_false_positives']),
@@ -51,19 +53,12 @@ export default {
     },
     async getFindingsList() {
       this.$axios.defaults.headers.Authorization = `Bearer ${this.tokenStore.token}`
-      this.$axios.get(`/finding/repository/${this.id}/`).then((res) => {
+      this.$axios.get(`/finding/repository/${this.id}`).then((res) => {
         this.findingsList = res.data['data']
+        console.log("fertig")
+        this.loadingFindings = false
         // eslint-disable-next-line no-unused-vars
       }).catch((err) => {/*pass to global error handler*/})
-    },
-    editFalsePositive() {
-      this.falsePositiveReadOnly = !this.falsePositiveReadOnly
-    },
-    updateFalsePositive(updatedValue) {
-      console.log("Call API-Update -> " + updatedValue.id)
-      console.log("New Value -> " + updatedValue.falsePositive.justification)
-      console.log("New Status -> " + updatedValue.falsePositive.isFalsePositive)
-      this.editFalsePositive()
     },
     formatScanDate(scanDateTime){
       return moment(String(scanDateTime)).format('MMMM Do YYYY, HH:mm:ss')
@@ -80,6 +75,7 @@ export default {
   }
 }
 </script>
+
 
 <template>
   <v-toolbar color="primary" :class="headerBlock" density="compact">
@@ -116,23 +112,23 @@ export default {
     <v-toolbar color="primary">
       <v-toolbar-title class="text-h5">Findings List</v-toolbar-title>
     </v-toolbar>
-      <v-container :class="findingsListSearchBar" fluid>
-        <v-row>
-          <v-col/>
-          <v-col/>
-          <v-col/>
-          <v-col>
-              <v-text-field
-                clearable
-                label="Search"
-                prepend-icon="mdi-database-search"
-                v-model="searchInput"
-              ></v-text-field>
-          </v-col>
-        </v-row>
-      </v-container>
-      <v-card class="mx-auto">
-        <v-container fluid>
+    <v-container :class="findingsListSearchBar" fluid>
+      <v-row>
+        <v-col/>
+        <v-col/>
+        <v-col/>
+        <v-col>
+          <v-text-field
+            clearable
+            label="Search"
+            prepend-icon="mdi-database-search"
+            v-model="searchInput"
+          ></v-text-field>
+        </v-col>
+      </v-row>
+    </v-container>
+    <v-card class="mx-auto">
+      <v-container fluid v-if="loadingFindings">
         <v-list>
           <v-list-item >
             <v-row :class="listHeader" class="text-h6">
@@ -143,7 +139,7 @@ export default {
                 Match
               </v-col>
               <v-col>
-                Date and time of scan
+                Save Date
               </v-col>
               <v-col style="text-align: right;">
                 Details
@@ -151,80 +147,33 @@ export default {
             </v-row>
             <v-divider/>
           </v-list-item>
-            <v-list-item
-              v-for="(scanResult, index) in filteredFindingsList"
-              :key="scanResult._id"
-              :class="listItem"
-            >
-                <v-row>
-                  <v-col>
-                    <span>
-                      {{scanResult.resultRaw.File.split('\\').pop().split('/').pop()}}
-                    <v-tooltip :text="scanResult.resultRaw.File" location="right" activator="parent"></v-tooltip>
-                    </span>
-                  </v-col>
-                  <v-col>{{scanResult.resultRaw.Match}}</v-col>
-                  <v-col>{{scanResult.save_date}}</v-col>
-                  <v-col style="text-align: right">
-
-                    <v-dialog v-model="rawResultDialog[index]" width="50%">
-                      <template v-slot:activator="{props}">
-                        <v-btn v-bind="props" color="primary"><v-icon>mdi-details</v-icon> Show Raw Result</v-btn>
-                      </template>
-                      <v-card >
-                        <v-card-text>
-                          <pre style="white-space:pre-wrap;">{{scanResult.resultRaw}}</pre>
-                        </v-card-text>
-                        <v-divider></v-divider>
-                        <v-card-actions>
-                          <v-col class="text-right">
-                            <v-btn color="primary" @click="rawResultDialog[index] = false">Close</v-btn>
-                          </v-col>
-                        </v-card-actions>
-                      </v-card>
-                    </v-dialog>
-
-                    <v-dialog v-model="falsePositiveDialog[index]" width="500">
-                    <template v-slot:activator="{props}">
-                      <v-btn v-bind="props" color="primary" style="margin-left: 1em"><v-icon>mdi-pencil-outline</v-icon>Review Status</v-btn>
-                    </template>
-                      <v-card >
-                        <v-card-item>
-                          <v-card-title>Status-Overview</v-card-title>
-                          <v-card-subtitle>Change Date: {{scanResult.falsePositive.change_date}}</v-card-subtitle>
-                          <v-card-text>
-                            <v-checkbox v-if="falsePositiveReadOnly === true" label="False-Positive" v-model="scanResult.falsePositive.isFalsePositive" disabled></v-checkbox>
-                            <v-checkbox v-else label="False-Positive" v-model="scanResult.falsePositive.isFalsePositive"></v-checkbox>
-                            <v-textarea
-                              :readonly="falsePositiveReadOnly"
-                              v-model="scanResult.falsePositive.justification"
-                              variant="underlined"
-                              no-resize
-                              rows="2"
-                              label="Reason for change"
-                            >
-                            </v-textarea>
-                          </v-card-text>
-                        </v-card-item>
-                        <v-divider></v-divider>
-                        <v-card-actions>
-                          <v-col class="text-right">
-                            <v-btn v-if="falsePositiveReadOnly === true" color="primary" @click="editFalsePositive">Edit</v-btn>
-                            <v-btn v-else  color="primary" @click="updateFalsePositive({falsePositive: scanResult.falsePositive, id: scanResult.id})">Save</v-btn>
-                            <v-btn color="primary" @click="falsePositiveDialog[index] = false">Close</v-btn>
-                          </v-col>
-                        </v-card-actions>
-                      </v-card>
-                    </v-dialog>
-                  </v-col>
-                </v-row>
-            </v-list-item>
         </v-list>
-        </v-container>
-      </v-card>
-    </div>
+        <v-progress-circular
+          indeterminate
+          color="primary">
+        </v-progress-circular>
+      </v-container>
+      <v-container fluid v-else>
+        <v-list>
+          <v-list-item >
+            <v-row :class="listHeader" class="text-h6">
+              <v-col>File Name</v-col>
+              <v-col>Match </v-col>
+              <v-col>Save Date</v-col>
+              <v-col style="text-align: right;">Details</v-col>
+            </v-row>
+            <v-divider/>
+          </v-list-item>
+          <v-list-item v-for="scanResult in filteredFindingsList" :key="scanResult._id" :class="listItem">
+          <FindingListItem :scan-result="scanResult" />
+          </v-list-item>
+        </v-list>
+      </v-container>
+    </v-card>
+  </div>
 
 </template>
+
 
 <style>
 
