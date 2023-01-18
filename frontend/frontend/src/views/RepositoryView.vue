@@ -90,7 +90,7 @@ export default {
       if (!this.searchInput) {
         return this.historyList
       } else {
-        return this.findingsList.filter((result) => JSON.stringify(result).toLowerCase().includes(this.searchInput.toLowerCase()))
+        return this.historyList.filter((result) => JSON.stringify(result).toLowerCase().includes(this.searchInput.toLowerCase()))
       }
     },
     pages() {
