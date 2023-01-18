@@ -15,6 +15,7 @@ import { registerPlugins } from '@/plugins'
 import {createPinia} from "pinia";
 import {axiosClient} from "@/api/axiosClient";
 
+
 const vuetify = createVuetify({
   components,
   directives,
