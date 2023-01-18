@@ -11,15 +11,16 @@ export default {
     }
   },
   created() {
-      this.getOverviewData()
-      this.getFindingsList()
+    this.getOverviewData()
+    this.getFindingsList()
+
   },
   props: {
     id: String,
     lastScan: String
   },
   components:{
-    FindingListItem
+    FindingListItem,
   },
   data() {
     return {
@@ -28,16 +29,33 @@ export default {
       overviewElementContainer: 'overview-element-container',
       overviewElement: 'overview-element',
       listHeader: 'list-header',
-      listItem: 'list-item',
       findingsListContainer: 'findings-list-container',
       findingsListSearchBar: 'findings-list-search-bar',
       findingsList: [],
       searchInput: '',
       overviewData: {},
       loadingFindings: true,
-      }
+      page: 1,
+      pageSize: 10,
+      listCount: 0,
+      historyList: []
+    }
   },
   methods: {
+    initPage: function() {
+      this.listCount = this.findingsList.length;
+      if (this.listCount < this.pageSize) {
+        this.historyList = this.findingsList;
+      } else {
+        this.historyList = this.findingsList.slice(0, this.pageSize);
+      }
+    },
+    updatePage: function(pageIndex) {
+      let start = (pageIndex - 1) * this.pageSize;
+      let end = pageIndex * this.pageSize;
+      this.historyList = this.findingsList.slice(start, end);
+      this.page = pageIndex;
+    },
     async getOverviewData() {
       this.$axios.defaults.headers.Authorization = `Bearer ${this.tokenStore.token}`
       this.$axios.get(`/finding/repository/${this.id}/count`).then((res) => {
@@ -48,6 +66,7 @@ export default {
           toReviewAmount: String(res.data['data']['total_number_of_todos']),
           lastScanData: this.lastScan
         }
+
         // eslint-disable-next-line no-unused-vars
       }).catch((err) => {/*pass to global error handler*/})
     },
@@ -55,8 +74,10 @@ export default {
       this.$axios.defaults.headers.Authorization = `Bearer ${this.tokenStore.token}`
       this.$axios.get(`/finding/repository/${this.id}`).then((res) => {
         this.findingsList = res.data['data']
-        console.log("fertig")
         this.loadingFindings = false
+
+        this.initPage();
+        this.updatePage(this.page);
         // eslint-disable-next-line no-unused-vars
       }).catch((err) => {/*pass to global error handler*/})
     },
@@ -67,15 +88,18 @@ export default {
   computed: {
     filteredFindingsList() {
       if (!this.searchInput) {
-        return this.findingsList
+        return this.historyList
       } else {
         return this.findingsList.filter((result) => JSON.stringify(result).toLowerCase().includes(this.searchInput.toLowerCase()))
       }
+    },
+    pages() {
+      if (this.pageSize == null || this.listCount == null) return 0;
+      return Math.ceil(this.listCount / this.pageSize);
     }
   }
 }
 </script>
-
 
 <template>
   <v-toolbar color="primary" :class="headerBlock" density="compact">
@@ -128,33 +152,8 @@ export default {
       </v-row>
     </v-container>
     <v-card class="mx-auto">
-      <v-container fluid v-if="loadingFindings">
-        <v-list>
-          <v-list-item >
-            <v-row :class="listHeader" class="text-h6">
-              <v-col>
-                File Name
-              </v-col>
-              <v-col>
-                Match
-              </v-col>
-              <v-col>
-                Save Date
-              </v-col>
-              <v-col style="text-align: right;">
-                Details
-              </v-col>
-            </v-row>
-            <v-divider/>
-          </v-list-item>
-        </v-list>
-        <v-progress-circular
-          indeterminate
-          color="primary">
-        </v-progress-circular>
-      </v-container>
-      <v-container fluid v-else>
-        <v-list>
+      <v-container fluid>
+        <v-list >
           <v-list-item >
             <v-row :class="listHeader" class="text-h6">
               <v-col>File Name</v-col>
@@ -164,14 +163,19 @@ export default {
             </v-row>
             <v-divider/>
           </v-list-item>
-          <v-list-item v-for="scanResult in filteredFindingsList" :key="scanResult._id" :class="listItem">
-          <FindingListItem :scan-result="scanResult" />
-          </v-list-item>
+        </v-list>
+        <v-list>
+          <FindingListItem v-for="scanResult in filteredFindingsList" :key="scanResult._id" :scan-result="scanResult"/>
+          <v-pagination
+            v-model="page"
+            :length="pages"
+            @update:modelValue="updatePage"
+          >
+          </v-pagination>
         </v-list>
       </v-container>
     </v-card>
   </div>
-
 </template>
 
 
@@ -197,12 +201,9 @@ export default {
   margin: auto
 }
 
-.list-item:hover {
-  background-color: aliceblue;
-}
-
 .findings-list-search-bar {
   justify-content: flex-end
 }
+
 
 </style>
