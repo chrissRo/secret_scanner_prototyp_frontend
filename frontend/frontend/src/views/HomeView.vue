@@ -1,14 +1,16 @@
 <script>
 
 import {useTokenStore} from "@/store/token";
-import moment from "moment";
-import scannerType from "@/api/apiModel";
+import RepositoryListItem from "@/components/RepositoryListItem";
 
 export default {
   setup() {
     return {
       tokenStore: useTokenStore()
     }
+  },
+  components: {
+    RepositoryListItem,
   },
   created() {
     this.getOverviewData()
@@ -49,21 +51,6 @@ export default {
         console.log(err)
       })
     },
-    formatScanDate(scanDateTime){
-      return moment(String(scanDateTime)).format('MMMM Do YYYY, HH:mm:ss')
-    },
-    getScannerString(type, version){
-      switch (type) {
-        case scannerType.Gitleaks:
-          return 'Gitleaks ' + version
-        default:
-          return 'Unknown Scanner'
-      }
-    },
-    getDocumentCountForRepo(repoName){
-      let data = this.overviewData.documentsPerRepository.filter((r) => r['_id'] === repoName)
-      return data[0]['count']
-    }
   },
   computed: {
     searchRepoList() {
@@ -82,8 +69,6 @@ export default {
     <v-toolbar color="primary">
       <v-toolbar-title class="text-h5">Overview</v-toolbar-title>
     </v-toolbar>
-
-
     <v-container :class="overviewElementContainer" fluid>
       <v-row no-gutters :class="overviewElements" v-model="overviewData">
           <v-col :class="overviewElement">
@@ -100,8 +85,6 @@ export default {
         </v-col>
       </v-row>
     </v-container>
-
-
   </div>
   <v-divider inset></v-divider>
 
@@ -151,47 +134,10 @@ export default {
             </v-row>
             <v-divider/>
           </v-list-item>
-        <v-list-item
+        <RepositoryListItem
           v-for="repo in searchRepoList"
           :key="repo._id"
-          :class="listItem">
-            <v-row >
-              <v-col>
-                {{ repo.repositoryName }}
-              </v-col>
-              <v-col>
-                {{ getScannerString(repo.scannerType, repo.scannerVersion)}}
-              </v-col>
-              <v-col>
-                {{ formatScanDate(repo.scanEndTime) }}
-              </v-col>
-              <v-col>
-                {{getDocumentCountForRepo(repo.repositoryName)}}
-              </v-col>
-              <v-col v-if="repo.repositoryPath != '.'" style="text-align: right;">
-                Manual Import
-                <router-link :to="{name: 'RepositoryView', params: {id: repo._id, lastScan: repo.scanEndTime}}"
-                             v-slot="{navigate}"
-                             style="margin-left: 1em">
-                  <v-btn @click="navigate" color="primary" role="link">
-                    <v-icon>mdi-pencil-box-multiple-outline</v-icon>
-                  </v-btn>
-                </router-link>
-              </v-col>
-              <v-col v-else style="text-align: right;">
-                <v-btn href="https://gitlab.com/TODO" color="primary">
-                  <v-icon>mdi-gitlab</v-icon>
-                </v-btn>
-                <router-link :to="{name: 'RepositoryView', params: {id: repo.repositoryName, lastScan: repo.scanEndTime}}"
-                             v-slot="{navigate}"
-                             style="margin-left: 1em">
-                  <v-btn @click="navigate" color="primary" role="link">
-                    <v-icon>mdi-pencil-box-multiple-outline</v-icon>
-                  </v-btn>
-                </router-link>
-              </v-col>
-            </v-row>
-        </v-list-item>
+          :class="listItem" :repository="repo" :overview-data="this.overviewData"/>
         </v-list>
         </v-container>
       </v-card>
