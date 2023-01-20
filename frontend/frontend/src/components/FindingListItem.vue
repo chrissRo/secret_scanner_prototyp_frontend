@@ -22,6 +22,7 @@ export default {
       falsePositiveDialog: false,
       falsePositiveReadOnly: true,
       listItem: 'list-item',
+      matchColumn: 'match-column'
     }
   },
   methods: {
@@ -50,7 +51,7 @@ export default {
       <v-tooltip :text="findingData.resultRaw.File" location="right" activator="parent"></v-tooltip>
       </span>
     </v-col>
-    <v-col><pre style="white-space:pre-wrap;" >{{findingData.resultRaw.Match}}</pre> </v-col>
+    <v-col :class="matchColumn"><pre style="white-space:pre-wrap;" >{{findingData.resultRaw.Match}}</pre> </v-col>
     <v-col>{{formatScanDate(findingData.save_date)}}</v-col>
     <v-col style="text-align: right">
       <v-dialog v-model="rawResultDialog" width="50%">
@@ -114,5 +115,9 @@ export default {
 
 .list-item:hover {
   background-color: aliceblue;
+}
+
+.match-column {
+  width: 25%;
 }
 </style>

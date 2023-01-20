@@ -66,7 +66,6 @@ export default {
           toReviewAmount: String(res.data['data']['total_number_of_todos']),
           lastScanData: this.lastScan
         }
-
         // eslint-disable-next-line no-unused-vars
       }).catch((err) => {/*pass to global error handler*/})
     },
