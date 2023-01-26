@@ -52,6 +52,11 @@ export default {
       </span>
     </v-col>
     <v-col :class="matchColumn"><pre style="white-space:pre-wrap;" >{{findingData.resultRaw.Match}}</pre> </v-col>
+    <v-col>
+      <v-chip v-if="findingData.falsePositive.isFalsePositive" class="ma-2" color="primary" text-color="white">False Positive</v-chip>
+      <v-chip v-else class="ma-2" color="red" text-color="white">True Positive</v-chip>
+      <v-chip v-if="findingData.falsePositive.justification === 'init'" class="ma-2" color="info" text-color="white" >Initial</v-chip>
+    </v-col>
     <v-col>{{formatScanDate(findingData.save_date)}}</v-col>
     <v-col style="text-align: right">
       <v-dialog v-model="rawResultDialog" width="50%">
@@ -118,6 +123,6 @@ export default {
 }
 
 .match-column {
-  width: 25%;
+  width: 20%;
 }
 </style>

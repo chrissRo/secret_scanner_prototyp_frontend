@@ -156,7 +156,8 @@ export default {
           <v-list-item >
             <v-row :class="listHeader" class="text-h6">
               <v-col>File Name</v-col>
-              <v-col>Match </v-col>
+              <v-col>Match</v-col>
+              <v-col>Current Status</v-col>
               <v-col>Save Date</v-col>
               <v-col style="text-align: right;">Details</v-col>
             </v-row>
