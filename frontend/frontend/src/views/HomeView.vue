@@ -134,6 +134,7 @@ export default {
             </v-row>
             <v-divider/>
           </v-list-item>
+
         <RepositoryListItem
           v-for="repo in searchRepoList"
           :key="repo._id"

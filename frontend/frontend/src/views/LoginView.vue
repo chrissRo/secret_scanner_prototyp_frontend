@@ -79,7 +79,7 @@ export default {
         </v-row>
         <v-row>
           <v-snackbar v-model="loginFailed" :timeout="snackbarTimeout" rounded="pill" color="primary">
-            Username or Password incorred. Please try again <v-icon>mdi-alert-circle</v-icon>
+            Username or Password incorred. Please try again
           </v-snackbar>
         </v-row>
       </v-form>

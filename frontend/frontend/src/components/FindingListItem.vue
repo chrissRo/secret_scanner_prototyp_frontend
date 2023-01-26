@@ -22,21 +22,37 @@ export default {
       falsePositiveDialog: false,
       falsePositiveReadOnly: true,
       listItem: 'list-item',
-      matchColumn: 'match-column'
+      matchColumn: 'match-column',
+      changeStatusFailed: false,
+      changeStatusSuccess: false,
+      snackbarTimeout: 3000,
+      changeStatusErrorMessage: '',
+      changeStatusSuccessMessage: '',
     }
   },
   methods: {
     editFalsePositive() {
       this.falsePositiveReadOnly = !this.falsePositiveReadOnly
     },
-    updateFalsePositive(updatedValue) {
-      console.log("Call API-Update -> " + updatedValue.id)
-      console.log("New Value -> " + updatedValue.falsePositive.justification)
-      console.log("New Status -> " + updatedValue.falsePositive.isFalsePositive)
+    async updateFalsePositive(updatedValue) {
+
+      this.$axios.defaults.headers.Authorization = `Bearer ${this.tokenStore.token}`
+      this.$axios.put(`/finding/${updatedValue.id}`, updatedValue).then((res) => {
+        this.changeStatusSuccessMessage = res.data.message
+        this.changeStatusSuccess = true
+        this.findingData = res.data.data
+      }).catch((err) => {
+        this.changeStatusErrorMessage = err.response.data.detail[0].msg
+        this.changeStatusFailed = true
+      })
       this.editFalsePositive()
     },
     formatScanDate(scanDateTime){
       return moment(String(scanDateTime)).format('MMMM Do YYYY, HH:mm:ss')
+    },
+    async changeFavoriteStatus() {
+      console.log("API-Call und API an sich fehlt noch")
+      this.findingData.isFavourite = !this.findingData.isFavourite
     }
   }
 }
@@ -46,6 +62,8 @@ export default {
 <template>
   <v-row :class="listItem">
     <v-col>
+      <v-icon v-if="findingData.isFavourite" @click="changeFavoriteStatus" color="primary" style="margin-right: 0.5em;">mdi-star</v-icon>
+      <v-icon v-else @click="changeFavoriteStatus" style="margin-right: 0.5em">mdi-star-outline</v-icon>
       <span>
         {{findingData.resultRaw.File.split('\\').pop().split('/').pop()}}
       <v-tooltip :text="findingData.resultRaw.File" location="right" activator="parent"></v-tooltip>
@@ -82,7 +100,7 @@ export default {
         <v-card >
           <v-card-item>
             <v-card-title>Status-Overview</v-card-title>
-            <v-card-subtitle>Change Date: {{findingData.falsePositive.change_date}}</v-card-subtitle>
+            <v-card-subtitle>Change Date: {{formatScanDate(findingData.falsePositive.change_date)}}</v-card-subtitle>
             <v-card-text>
               <v-checkbox v-if="falsePositiveReadOnly === true" label="False-Positive" v-model="findingData.falsePositive.isFalsePositive" disabled></v-checkbox>
               <v-checkbox v-else label="False-Positive" v-model="findingData.falsePositive.isFalsePositive"></v-checkbox>
@@ -101,7 +119,7 @@ export default {
           <v-card-actions>
             <v-col class="text-right">
               <v-btn v-if="falsePositiveReadOnly === true" color="primary" @click="editFalsePositive">Edit</v-btn>
-              <v-btn v-else  color="primary" @click="updateFalsePositive({falsePositive: scanResult.falsePositive, id: scanResult.id})">Save</v-btn>
+              <v-btn v-else  color="primary" @click="updateFalsePositive({falsePositive: findingData.falsePositive, id: findingData._id})">Save</v-btn>
               <v-btn color="primary" @click="falsePositiveDialog = false">Close</v-btn>
             </v-col>
           </v-card-actions>
@@ -109,6 +127,13 @@ export default {
       </v-dialog>
     </v-col>
   </v-row>
+
+  <v-snackbar v-model="changeStatusFailed" :timeout="snackbarTimeout" rounded="pill" color="red" text-color="white">
+    {{changeStatusErrorMessage}}
+  </v-snackbar>
+  <v-snackbar v-model="changeStatusSuccess" :timeout="snackbarTimeout" rounded="pill" color="primary" text-color="white">
+    {{changeStatusSuccessMessage}}
+  </v-snackbar>
 
 </template>
 
