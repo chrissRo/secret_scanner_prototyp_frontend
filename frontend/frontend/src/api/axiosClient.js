@@ -11,6 +11,8 @@ axiosClient.interceptors.response.use((res) => res, (err) => {
     case 403:
       router.push('/login/')
       break
+    case 422:
+      return Promise.reject(err)
     default:
       console.log('Unknown StatusCode ->' + err.response.status)
   }
