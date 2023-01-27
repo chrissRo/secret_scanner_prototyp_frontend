@@ -37,7 +37,7 @@ export default {
     async updateFalsePositive(updatedValue) {
 
       this.$axios.defaults.headers.Authorization = `Bearer ${this.tokenStore.token}`
-      this.$axios.put(`/finding/${updatedValue.id}`, updatedValue).then((res) => {
+      this.$axios.put(`/finding/${updatedValue.id}/fp`, updatedValue).then((res) => {
         this.changeStatusSuccessMessage = res.data.message
         this.changeStatusSuccess = true
         this.findingData = res.data.data
@@ -51,8 +51,14 @@ export default {
       return moment(String(scanDateTime)).format('MMMM Do YYYY, HH:mm:ss')
     },
     async changeFavoriteStatus() {
-      console.log("API-Call und API an sich fehlt noch")
-      this.findingData.isFavourite = !this.findingData.isFavourite
+      this.$axios.defaults.headers.Authorization = `Bearer ${this.tokenStore.token}`
+      this.$axios.put(`/finding/${this.findingData._id}/fav`, {'isFavourite': !this.findingData.isFavourite }).then(() => {
+        this.findingData.isFavourite = !this.findingData.isFavourite
+      }).catch((err) => {
+        this.changeStatusErrorMessage = err.response.data.detail[0].msg
+        this.changeStatusFailed = true
+      })
+
     }
   }
 }
@@ -63,7 +69,7 @@ export default {
   <v-row :class="listItem">
     <v-col>
       <v-icon v-if="findingData.isFavourite" @click="changeFavoriteStatus" color="primary" style="margin-right: 0.5em;">mdi-star</v-icon>
-      <v-icon v-else @click="changeFavoriteStatus" style="margin-right: 0.5em">mdi-star-outline</v-icon>
+      <v-icon v-else @click="changeFavoriteStatus()" style="margin-right: 0.5em">mdi-star-outline</v-icon>
       <span>
         {{findingData.resultRaw.File.split('\\').pop().split('/').pop()}}
       <v-tooltip :text="findingData.resultRaw.File" location="right" activator="parent"></v-tooltip>
