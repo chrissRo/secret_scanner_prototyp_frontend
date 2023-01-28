@@ -3,6 +3,7 @@ import HomeView from '@/views/HomeView.vue'
 import RepositoryView from '@/views/RepositoryView.vue'
 import LoginView from '@/views/LoginView.vue'
 import NotFoundView from '@/views/NotFoundView.vue'
+import FavouriteView from '@/views/FavouriteView.vue'
 import {useTokenStore} from "@/store/token";
 
 const routes = [
@@ -21,6 +22,12 @@ const routes = [
     name: 'RepositoryView',
     component: RepositoryView,
     props: true,
+    auth: true
+  },
+  {
+    path: '/favourite-view',
+    name: 'FavouriteView',
+    component: FavouriteView,
     auth: true
   },
   {
