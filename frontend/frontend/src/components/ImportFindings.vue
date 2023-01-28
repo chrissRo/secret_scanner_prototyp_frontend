@@ -1,19 +1,39 @@
 <script>
+import {useTokenStore} from "@/store/token";
+
 export default {
-    data () {
+  setup() {
+    return {
+      tokenStore: useTokenStore()
+    }
+  },
+  async created() {
+    await this.getAvailableScanner()
+  },
+  data () {
       return {
         dialog: false,
         notifications: false,
         sound: true,
         widgets: false,
+        availableScanner: {}
       }
     },
   methods: {
       async uploadFindings() {
         console.log('Todo Upload')
         this.dialog = false
+      },
+      async getAvailableScanner() {
+        this.$axios.defaults.headers.Authorization = `Bearer ${this.tokenStore.token}`
+        this.$axios.get('/misc/scanner').then((res) =>{
+          this.availableScanner = res.data
+        }).catch((err)=>{
+          // Todo
+          console.log(err)
+        })
       }
-  }
+    }
   }
 </script>
 
@@ -37,9 +57,46 @@ export default {
         </v-toolbar-items>
       </v-toolbar>
       <v-list lines="two" subheader>
-        <v-list-subheader>Data </v-list-subheader>
+        <v-list-item title="Repository Information"></v-list-item>
+        <v-list-item>
+          <v-row>
+            <v-col>
+              <v-text-field
+                label="Repository Name*"
+                required
+              ></v-text-field>
+            </v-col>
+          <v-col>
+            <v-text-field
+              label="Repository Path/Address*"
+              required
+            ></v-text-field>
+          </v-col>
+          </v-row>
+        </v-list-item>
+        <v-list-item>
+          <v-row>
+            <v-col>
+              <v-select
+                :items="Object.keys(this.availableScanner)"
+                label="Scanner Type*"
+                required
+              ></v-select>
+            </v-col>
+            <v-col>
+              <v-text-field
+                label="Scanner Version*"
+                required
+              ></v-text-field>
+            </v-col>
+          </v-row>
+        </v-list-item>
       </v-list>
       <v-divider></v-divider>
+      <v-list>
+        <v-list-item title="Data"></v-list-item>
+        <v-list-item>todo -> Drag and Drop?</v-list-item>
+      </v-list>
     </v-card>
   </v-dialog>
 </template>
