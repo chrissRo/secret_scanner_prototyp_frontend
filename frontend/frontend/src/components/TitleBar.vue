@@ -1,7 +1,9 @@
 <script>
 import {useTokenStore} from "@/store/token";
+import ToolbarMenuDropdown from "@/components/ToolbarMenuDropdown";
 
 export default {
+  components: {ToolbarMenuDropdown},
   setup() {
     return {
       tokenStore: useTokenStore()
@@ -30,10 +32,8 @@ export default {
         <v-toolbar-title>Welcome to FP-Marker</v-toolbar-title>
         <v-spacer></v-spacer>
         <div :class="navigationButtonGroup">
-          <v-btn :class="navigationButton" variant="tonal" color="info">Todo: Import/Export</v-btn>
-          <v-btn :class="navigationButton" variant="tonal" color="info">Repositories-View</v-btn>
           <v-btn :class="navigationButton" variant="tonal" color="info">Files-View</v-btn>
-          <v-btn :class="navigationButton" variant="tonal" color="primary" @click="logout" >Logout</v-btn>
+          <ToolbarMenuDropdown/>
         </div>
       </v-toolbar>
 </template>
