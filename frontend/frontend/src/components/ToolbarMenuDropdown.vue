@@ -1,7 +1,9 @@
 <script>
 import {useTokenStore} from "@/store/token";
+import ImportFindings from "@/components/ImportFindings";
 
 export default {
+  components: {ImportFindings},
   setup() {
     return {
       tokenStore: useTokenStore()
@@ -33,7 +35,8 @@ export default {
       </v-btn>
     </template>
     <v-list density="compact" style="margin-top: 0.5em">
-      <v-list-item :class="listItem"><v-list-item-title>Import Findings</v-list-item-title></v-list-item>
+      <v-list-item :class="listItem"><ImportFindings/>
+      </v-list-item>
       <v-list-item :class="listItem"><v-list-item-title>Export Findings</v-list-item-title></v-list-item>
       <v-divider></v-divider>
       <v-list-item :class="listItem">
