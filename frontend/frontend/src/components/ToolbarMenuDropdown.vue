@@ -35,8 +35,7 @@ export default {
       </v-btn>
     </template>
     <v-list density="compact" style="margin-top: 0.5em">
-      <v-list-item :class="listItem"><ImportFindings/>
-      </v-list-item>
+      <v-list-item :class="listItem"><ImportFindings/></v-list-item>
       <v-list-item :class="listItem"><v-list-item-title>Export Findings</v-list-item-title></v-list-item>
       <v-divider></v-divider>
       <v-list-item :class="listItem">
@@ -62,5 +61,7 @@ export default {
 <style>
 .list-item:hover {
   background-color: aliceblue;
+  cursor: pointer;
 }
+
 </style>
