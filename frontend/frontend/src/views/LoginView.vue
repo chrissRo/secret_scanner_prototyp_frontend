@@ -20,7 +20,6 @@ export default {
   },
   methods: {
     async login() {
-      console.log('Login ->' + this.username + ':' + this.password)
       let formData = new FormData()
       formData.append('username', this.username)
       formData.append('password', this.password)

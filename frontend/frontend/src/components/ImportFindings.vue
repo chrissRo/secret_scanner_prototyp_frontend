@@ -18,7 +18,9 @@ export default {
           repositoryName: '',
           repositoryPath: '',
           scannerType: '',
-          scannerVersion: '',},
+          scannerVersion: '',
+          scanDate: Date},
+        repositoryInformationUpload: {},
         fileUploadRules: [
           value => {
             return !value || !value.length || value[0].size < 10000000 || 'File size should be less than 10 MB!'
@@ -31,7 +33,24 @@ export default {
     },
   methods: {
       async uploadFindings() {
-        console.log('Todo Upload')
+        console.log('Todo Fix Upload')
+        this.findingFiles.forEach((f) =>{
+          this.$axios.defaults.headers.Authorization = `Bearer ${this.tokenStore.token}`
+          let formData = new FormData()
+          formData.append('scannerType',this.availableScanner[this.repositoryInformationUpload.scannerType])
+          formData.append('scannerVersion',this.repositoryInformationUpload.scannerVersion)
+          formData.append('inputType', 1)
+          formData.append('repositoryPath',this.repositoryInformationUpload.repositoryPath)
+          formData.append('repositoryName',this.repositoryInformationUpload.repositoryName)
+          formData.append('scanDate', '2023-01-31 18:46:45.156038')
+          formData.append('new_file', new Blob(f))
+          this.$axios.post('/finding/file_upload', formData, { headers:
+              {'Content-Type': 'multipart/form-data'}}).then((res) => {
+            console.log(res.data)
+          }).catch((err) => {
+            console.log(err.toString())
+          })
+        })
         this.findingFiles = []
       },
       async getAvailableScanner() {
@@ -49,10 +68,11 @@ export default {
     appendNewFile() {
         if (this.findingFile !== null) {
           this.findingFiles.push(this.findingFile)
+          this.repositoryInformationUpload = this.repositoryInformation
           this.repositoryInformation = {}
           this.findingFile = null
         }
-    }
+      }
     }
 }
 </script>
@@ -105,14 +125,14 @@ export default {
               <v-text-field
                 label="Repository Name*"
                 required
-                v-model="repositoryInformation.repositoryName"
+                v-model="this.repositoryInformation.repositoryName"
               ></v-text-field>
             </v-col>
           <v-col>
             <v-text-field
               label="Repository Path/Address*"
               required
-              v-model="repositoryInformation.repositoryPath"
+              v-model="this.repositoryInformation.repositoryPath"
             ></v-text-field>
           </v-col>
           </v-row>
@@ -124,14 +144,14 @@ export default {
                 :items="Object.keys(this.availableScanner)"
                 label="Scanner Type*"
                 required
-                v-model="repositoryInformation.scannerType"
+                v-model="this.repositoryInformation.scannerType"
               ></v-select>
             </v-col>
             <v-col>
               <v-text-field
                 label="Scanner Version*"
                 required
-                v-model="repositoryInformation.scannerVersion"
+                v-model="this.repositoryInformation.scannerVersion"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -143,8 +163,8 @@ export default {
         <v-list-item >
           <v-row>
             <v-col>
-              <v-file-input v-if="requiredFieldsAreFilled() === true" v-model="findingFile" :rules="this.fileUploadRules" clearable label="File input" accept="application/JSON"></v-file-input>
-              <v-file-input v-else :rules="this.fileUploadRules" disabled label="File Input" accept="application/JSON"></v-file-input>
+              <v-file-input v-if="requiredFieldsAreFilled() === true" v-model="this.findingFile" :rules="this.fileUploadRules" clearable accept=".json" show-size label="File input"></v-file-input>
+              <v-file-input v-else :rules="this.fileUploadRules" disabled label="File Input"></v-file-input>
             </v-col>
               <v-col>
                 <v-btn v-if="requiredFieldsAreFilled() === true" @click="appendNewFile" color="primary" style="margin-top: 0.5em"><v-icon>mdi-plus</v-icon></v-btn>
