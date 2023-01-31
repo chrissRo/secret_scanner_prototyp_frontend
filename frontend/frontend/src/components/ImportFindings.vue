@@ -12,17 +12,27 @@ export default {
   },
   data () {
       return {
-        dialog: false,
-        notifications: false,
-        sound: true,
-        widgets: false,
-        availableScanner: {}
+        importDialog: false,
+        availableScanner: {},
+        repositoryInformation: {
+          repositoryName: '',
+          repositoryPath: '',
+          scannerType: '',
+          scannerVersion: '',},
+        fileUploadRules: [
+          value => {
+            return !value || !value.length || value[0].size < 10000000 || 'File size should be less than 10 MB!'
+          },
+        ],
+        findingFile: null,
+        findingFiles: [],
+        cancelImport: false,
       }
     },
   methods: {
       async uploadFindings() {
         console.log('Todo Upload')
-        this.dialog = false
+        this.findingFiles = []
       },
       async getAvailableScanner() {
         this.$axios.defaults.headers.Authorization = `Bearer ${this.tokenStore.token}`
@@ -32,14 +42,24 @@ export default {
           // Todo
           console.log(err)
         })
-      }
+      },
+    requiredFieldsAreFilled() {
+        return Object.values(this.repositoryInformation).every(prop => prop !== '')
+      },
+    appendNewFile() {
+        if (this.findingFile !== null) {
+          this.findingFiles.push(this.findingFile)
+          this.repositoryInformation = {}
+          this.findingFile = null
+        }
     }
-  }
+    }
+}
 </script>
 
 <template>
   <v-dialog
-    v-model="dialog"
+    v-model="importDialog"
     fullscreen
     :scrim="false"
     transition="dialog-bottom-transition"
@@ -49,12 +69,33 @@ export default {
     </template>
     <v-card>
       <v-toolbar dark color="primary">
-        <v-btn icon dark @click="dialog = false"><v-icon>mdi-close</v-icon></v-btn>
+        <v-btn v-if="this.findingFiles.length > 0" icon dark @click="cancelImport = true"><v-icon>mdi-close</v-icon></v-btn>
+        <v-btn v-else icon dark @click="importDialog = false"><v-icon>mdi-close</v-icon></v-btn>
+        <v-dialog v-model="cancelImport" >
+          <v-row>
+            <v-col></v-col>
+            <v-col></v-col>
+            <v-col>
+              <v-card >
+                <v-card-title>Cancel Import</v-card-title>
+                <v-card-text>You have unprocessed files.</v-card-text>
+                <v-card-text>Do you really want to cancel the import?</v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn @click="cancelImport = false" color="primary" style="text-align: right">No</v-btn>
+                <v-btn @click="importDialog = false" color="primary" style="text-align: right">Yes</v-btn>
+              </v-card-actions>
+            </v-card></v-col>
+            <v-col></v-col>
+            <v-col></v-col>
+          </v-row>
+        </v-dialog>
+
         <v-toolbar-title>Import Findings</v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-toolbar-items>
-          <v-btn variant="text" @click="uploadFindings()">Upload</v-btn>
-        </v-toolbar-items>
+          <v-btn icon dark @click="uploadFindings()"><v-icon>mdi-import</v-icon>
+            <v-badge color="red" :content="this.findingFiles.length" inline></v-badge>
+          </v-btn>
       </v-toolbar>
       <v-list lines="two" subheader>
         <v-list-item title="Repository Information"></v-list-item>
@@ -64,12 +105,14 @@ export default {
               <v-text-field
                 label="Repository Name*"
                 required
+                v-model="repositoryInformation.repositoryName"
               ></v-text-field>
             </v-col>
           <v-col>
             <v-text-field
               label="Repository Path/Address*"
               required
+              v-model="repositoryInformation.repositoryPath"
             ></v-text-field>
           </v-col>
           </v-row>
@@ -81,22 +124,36 @@ export default {
                 :items="Object.keys(this.availableScanner)"
                 label="Scanner Type*"
                 required
+                v-model="repositoryInformation.scannerType"
               ></v-select>
             </v-col>
             <v-col>
               <v-text-field
                 label="Scanner Version*"
                 required
+                v-model="repositoryInformation.scannerVersion"
               ></v-text-field>
             </v-col>
           </v-row>
         </v-list-item>
       </v-list>
       <v-divider></v-divider>
-      <v-list>
-        <v-list-item title="Data"></v-list-item>
-        <v-list-item>todo -> Drag and Drop?</v-list-item>
+      <v-list lines="two" subheader>
+        <v-list-item title="Upload Findings"></v-list-item>
+        <v-list-item >
+          <v-row>
+            <v-col>
+              <v-file-input v-if="requiredFieldsAreFilled() === true" v-model="findingFile" :rules="this.fileUploadRules" clearable label="File input" accept="application/JSON"></v-file-input>
+              <v-file-input v-else :rules="this.fileUploadRules" disabled label="File Input" accept="application/JSON"></v-file-input>
+            </v-col>
+              <v-col>
+                <v-btn v-if="requiredFieldsAreFilled() === true" @click="appendNewFile" color="primary" style="margin-top: 0.5em"><v-icon>mdi-plus</v-icon></v-btn>
+                <v-btn v-else color="primary" disabled style="margin-top: 0.5em"><v-icon>mdi-plus</v-icon></v-btn>
+              </v-col>
+          </v-row>
+        </v-list-item>
       </v-list>
+      <v-divider></v-divider>
     </v-card>
   </v-dialog>
 </template>
