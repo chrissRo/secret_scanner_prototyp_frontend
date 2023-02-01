@@ -1,11 +1,15 @@
 <script>
 import {useTokenStore} from "@/store/token";
+import ImportFindingsProcessUploadLoader from "@/components/ImportFindingsProcessUploadLoader";
 
 export default {
   setup() {
     return {
       tokenStore: useTokenStore()
     }
+  },
+  components: {
+    ImportFindingsProcessUploadLoader
   },
   async created() {
     await this.getAvailableScanner()
@@ -29,11 +33,12 @@ export default {
         findingFile: null,
         findingFiles: [],
         cancelImport: false,
+        uploadDialog: false,
+        uploadStepCounter: 0
       }
     },
   methods: {
       async uploadFindings() {
-        console.log('Todo Fix Upload')
         this.findingFiles.forEach((f) =>{
           this.$axios.defaults.headers.Authorization = `Bearer ${this.tokenStore.token}`
           let formData = new FormData()
@@ -44,9 +49,13 @@ export default {
           formData.append('repositoryName',this.repositoryInformationUpload.repositoryName)
           formData.append('scanDate', '2023-01-31 18:46:45.156038')
           formData.append('new_file', new Blob(f))
-          this.$axios.post('/finding/file_upload', formData, { headers:
-              {'Content-Type': 'multipart/form-data'}}).then((res) => {
-            console.log(res.data)
+          //this.uploadStepCounter += 1
+          this.$axios.post(
+            '/finding/file_upload',
+            formData,
+            { headers: {'Content-Type': 'multipart/form-data'}}
+          ).then((res) => {
+            console.log(res)
           }).catch((err) => {
             console.log(err.toString())
           })
@@ -174,6 +183,8 @@ export default {
         </v-list-item>
       </v-list>
       <v-divider></v-divider>
+      <ImportFindingsProcessUploadLoader :props-dialog="uploadDialog" :props-step-counter="uploadStepCounter"/>
+
     </v-card>
   </v-dialog>
 </template>
