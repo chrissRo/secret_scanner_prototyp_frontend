@@ -45,9 +45,8 @@ export default {
           formData.append('inputType', 1)
           formData.append('repositoryPath',this.repositoryInformationUpload.repositoryPath)
           formData.append('repositoryName',this.repositoryInformationUpload.repositoryName)
-          formData.append('scanDate', '2023-01-31 18:46:45.156038')
+          formData.append('scanDate', Date.now())
           formData.append('new_file', new Blob(f))
-          //this.uploadStepCounter += 1
           this.$axios.post(
             '/finding/file_upload',
             formData,
