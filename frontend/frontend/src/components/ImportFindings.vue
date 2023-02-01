@@ -30,6 +30,8 @@ export default {
         findingFiles: [],
         cancelImport: false,
         uploadDialog: false,
+        snackbarMessage: '',
+        snackbarTimeout: 3000,
         uploadStepCounter: 0
       }
     },
@@ -52,8 +54,12 @@ export default {
             { headers: {'Content-Type': 'multipart/form-data'}}
           ).then((res) => {
             console.log(res)
+            this.snackbarMessage = res.data.message + ': ' + res.data.data
+            this.uploadDialog = true
           }).catch((err) => {
             console.log(err.toString())
+            this.snackbarMessage = err.toString()
+            this.uploadDialog = true
           })
         })
         this.findingFiles = []
@@ -182,5 +188,8 @@ export default {
       <!--ImportFindingsProcessUploadLoader :props-dialog="uploadDialog" :props-step-counter="uploadStepCounter"/-->
 
     </v-card>
+    <v-snackbar v-model="uploadDialog" :timeout="snackbarTimeout" rounded="pill" color="primary">
+      {{this.snackbarMessage}}
+    </v-snackbar>
   </v-dialog>
 </template>
