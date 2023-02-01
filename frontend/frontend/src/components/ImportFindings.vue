@@ -1,15 +1,11 @@
 <script>
 import {useTokenStore} from "@/store/token";
-import ImportFindingsProcessUploadLoader from "@/components/ImportFindingsProcessUploadLoader";
 
 export default {
   setup() {
     return {
       tokenStore: useTokenStore()
     }
-  },
-  components: {
-    ImportFindingsProcessUploadLoader
   },
   async created() {
     await this.getAvailableScanner()
@@ -183,7 +179,7 @@ export default {
         </v-list-item>
       </v-list>
       <v-divider></v-divider>
-      <ImportFindingsProcessUploadLoader :props-dialog="uploadDialog" :props-step-counter="uploadStepCounter"/>
+      <!--ImportFindingsProcessUploadLoader :props-dialog="uploadDialog" :props-step-counter="uploadStepCounter"/-->
 
     </v-card>
   </v-dialog>
