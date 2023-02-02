@@ -150,22 +150,31 @@ export default {
           ></v-text-field>
         </v-col>
       </v-row>
+
     </v-container>
     <v-card class="mx-auto">
       <v-container fluid>
+        <v-row >
+          <v-col></v-col>
+          <p style="margin-right: 1em">
+            <v-checkbox v-model="bulkEditActive" color="primary" hide-details="true" label="Bulk Edit"></v-checkbox>
+          </p>
+        </v-row>
         <v-list >
           <v-list-item >
+
             <v-row :class="listHeader" class="text-h6">
               <v-col>File Name</v-col>
               <v-col>Match</v-col>
               <v-col>Current Status</v-col>
               <v-col>Save Date</v-col>
-              <v-col style="text-align: right"></v-col>
-                <p><v-checkbox v-model="bulkEditActive" color="primary" hide-details="true" label="Bulk Edit"></v-checkbox></p>
+              <v-col style="text-align: right">Details</v-col>
             </v-row>
             <v-divider/>
           </v-list-item>
         </v-list>
+
+
         <v-list>
           <FindingListItem v-for="scanResult in filteredFindingsList" :key="scanResult._id" :scan-result="scanResult" :bulk-edit-active="bulkEditActive"/>
           <v-pagination
