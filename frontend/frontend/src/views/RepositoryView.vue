@@ -157,7 +157,7 @@ export default {
         <v-row >
           <v-col></v-col>
           <p style="margin-right: 1em">
-            <v-checkbox v-model="bulkEditActive" color="primary" hide-details="true" label="Bulk Edit"></v-checkbox>
+            <v-checkbox v-model="bulkEditActive" color="primary" hide-details="true" label="Bulk Edit Status"></v-checkbox>
           </p>
         </v-row>
         <v-list >
