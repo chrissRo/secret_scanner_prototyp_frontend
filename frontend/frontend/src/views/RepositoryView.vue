@@ -38,7 +38,8 @@ export default {
       page: 1,
       pageSize: 10,
       listCount: 0,
-      historyList: []
+      historyList: [],
+      bulkEditActive: false,
     }
   },
   methods: {
@@ -159,13 +160,14 @@ export default {
               <v-col>Match</v-col>
               <v-col>Current Status</v-col>
               <v-col>Save Date</v-col>
-              <v-col style="text-align: right;">Details</v-col>
+              <v-col style="text-align: right"></v-col>
+                <p><v-checkbox v-model="bulkEditActive" color="primary" hide-details="true" label="Bulk Edit"></v-checkbox></p>
             </v-row>
             <v-divider/>
           </v-list-item>
         </v-list>
         <v-list>
-          <FindingListItem v-for="scanResult in filteredFindingsList" :key="scanResult._id" :scan-result="scanResult"/>
+          <FindingListItem v-for="scanResult in filteredFindingsList" :key="scanResult._id" :scan-result="scanResult" :bulk-edit-active="bulkEditActive"/>
           <v-pagination
             v-model="page"
             :length="pages"
