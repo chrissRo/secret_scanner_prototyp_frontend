@@ -90,10 +90,15 @@ export default {
       <v-icon v-else @click="changeFavoriteStatus()" style="margin-right: 0.5em">mdi-star-outline</v-icon>
       <span>
         {{findingData.resultRaw.File.split('\\').pop().split('/').pop()}}
-      <v-tooltip :text="findingData.resultRaw.File" location="right" activator="parent"></v-tooltip>
+        <v-tooltip :text="`${findingData.resultRaw.File}:${findingData.resultRaw.Commit}`" location="bottom" activator="parent"></v-tooltip>
       </span>
     </v-col>
-    <v-col :class="matchColumn"><pre style="white-space:pre-wrap;" >{{findingData.resultRaw.Match}}</pre> </v-col>
+    <v-col :class="matchColumn">
+      <span>
+        <pre style="white-space:pre-wrap;" >{{findingData.resultRaw.Match}}</pre>
+        <v-tooltip :text="`${findingData.resultRaw.RuleID}`" location="bottom" activator="parent"></v-tooltip>
+      </span>
+    </v-col>
     <v-col>
       <v-chip v-if="findingData.falsePositive.isFalsePositive" class="ma-2" color="primary" text-color="white">False Positive</v-chip>
       <v-chip v-else class="ma-2" color="red" text-color="white">True Positive</v-chip>
