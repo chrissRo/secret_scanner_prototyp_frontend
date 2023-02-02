@@ -10,7 +10,8 @@ export default {
     }
   },
   props: {
-    scanResult: {}
+    scanResult: {},
+    bulkEditActive: null
   },
   created() {
     this.findingData = {...this.scanResult}
@@ -46,6 +47,23 @@ export default {
         this.changeStatusFailed = true
       })
       this.editFalsePositive()
+    },
+    async bulkUpdateFalsePositive(updatedValue) {
+      this.$axios.defaults.headers.Authorization = `Bearer ${this.tokenStore.token}`
+
+      updatedValue.falsePositive.isFalsePositive = this.findingData.falsePositive.isFalsePositive
+      updatedValue.falsePositive.justification = 'Bulk Edit'
+      updatedValue.falsePositive.change_date = Date.now()
+
+      this.$axios.put(`/finding/${updatedValue.id}/fp`, updatedValue).then((res) => {
+        this.changeStatusSuccessMessage = res.data.message
+        this.changeStatusSuccess = true
+        this.findingData = res.data.data
+        console.log(this.findingData)
+      }).catch((err) => {
+        this.changeStatusErrorMessage = err.response.data.detail[0].msg
+        this.changeStatusFailed = true
+      })
     },
     formatScanDate(scanDateTime){
       return moment(String(scanDateTime)).format('MMMM Do YYYY, HH:mm:ss')
@@ -132,6 +150,9 @@ export default {
         </v-card>
       </v-dialog>
     </v-col>
+    <p v-if="bulkEditActive">
+      <v-checkbox v-model="findingData.falsePositive.isFalsePositive" color="primary" hide-details="true"
+                  @change="bulkUpdateFalsePositive({falsePositive: findingData.falsePositive, id: findingData._id})"></v-checkbox></p>
   </v-row>
 
   <v-snackbar v-model="changeStatusFailed" :timeout="snackbarTimeout" rounded="pill" color="red" text-color="white">
@@ -156,4 +177,5 @@ export default {
 .match-column {
   width: 20%;
 }
+
 </style>
