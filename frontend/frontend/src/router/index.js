@@ -1,9 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
-import RepositoryView from '@/views/RepositoryView.vue'
+import RepositoryFindingView from '@/views/RepositoryFindingView.vue'
 import LoginView from '@/views/LoginView.vue'
 import NotFoundView from '@/views/NotFoundView.vue'
 import FavouriteView from '@/views/FavouriteView.vue'
+import TruePositiveView from '@/views/TruePositiveView.vue'
 import {useTokenStore} from "@/store/token";
 
 const routes = [
@@ -18,9 +19,9 @@ const routes = [
     component: LoginView
   },
   {
-    path: '/repository-view/:id/:lastScan',
-    name: 'RepositoryView',
-    component: RepositoryView,
+    path: '/repository-finding-view/:id/:lastScan',
+    name: 'RepositoryFindingView',
+    component: RepositoryFindingView,
     props: true,
     auth: true
   },
@@ -28,6 +29,12 @@ const routes = [
     path: '/favourite-view',
     name: 'FavouriteView',
     component: FavouriteView,
+    auth: true
+  },
+  {
+    path: '/true-positive-view',
+    name: 'TruePositiveView',
+    component: TruePositiveView,
     auth: true
   },
   {

@@ -52,7 +52,7 @@ export default {
     </v-col>
     <v-col v-if="repo.repositoryPath != '.'" style="text-align: right;">
       Manual Import
-      <router-link :to="{name: 'RepositoryView', params: {id: repo.repositoryName, lastScan: repo.scanEndTime}}"
+      <router-link :to="{name: 'RepositoryFindingView', params: {id: repo.repositoryName, lastScan: repo.scanEndTime}}"
                    v-slot="{navigate}"
                    style="margin-left: 1em">
         <v-btn @click="navigate" color="primary" role="link">
@@ -64,7 +64,7 @@ export default {
       <v-btn href="https://gitlab.com/TODO" color="primary">
         <v-icon>mdi-gitlab</v-icon>
       </v-btn>
-      <router-link :to="{name: 'RepositoryView', params: {id: repo.repositoryName, lastScan: repo.scanEndTime}}"
+      <router-link :to="{name: 'RepositoryFindingView', params: {id: repo.repositoryName, lastScan: repo.scanEndTime}}"
                    v-slot="{navigate}"
                    style="margin-left: 1em">
         <v-btn @click="navigate" color="primary" role="link">
