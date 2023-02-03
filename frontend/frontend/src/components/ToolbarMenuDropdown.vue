@@ -42,14 +42,21 @@ export default {
         <router-link :to="{name: 'HomeView'}"
                      v-slot="{navigate}"
                      style="text-decoration: none;">
-        <v-list-item-title @click="navigate" >Repository Overview</v-list-item-title>
+        <v-list-item-title @click="navigate" style="color: black">Repository Overview</v-list-item-title>
         </router-link>
       </v-list-item>
       <v-list-item :class="listItem">
         <router-link :to="{name: 'FavouriteView'}"
                      v-slot="{navigate}"
                      style="text-decoration: none;">
-          <v-list-item-title @click="navigate" >Favourite Overview</v-list-item-title>
+          <v-list-item-title @click="navigate" style="color: black">Favourite Overview</v-list-item-title>
+        </router-link>
+      </v-list-item>
+      <v-list-item :class="listItem">
+        <router-link :to="{name: 'TruePositiveView'}"
+                     v-slot="{navigate}"
+                     style="text-decoration: none;">
+          <v-list-item-title @click="navigate" style="color: black">True Positive Overview</v-list-item-title>
         </router-link>
       </v-list-item>
       <v-divider></v-divider>

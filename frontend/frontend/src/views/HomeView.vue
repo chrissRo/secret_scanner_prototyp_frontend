@@ -38,7 +38,9 @@ export default {
         this.overviewData = {
           documentsAmount: String(res.data['data']['total_number_of_documents']),
           reposAmount: String(res.data['data']['total_number_of_distinct_repos']),
-          documentsPerRepository: res.data['data']['documents_per_repository']
+          documentsPerRepository: res.data['data']['documents_per_repository'],
+          totalFalsePositives: String(res.data['data']['total_false_positives']),
+          totalTruePositives: String(res.data['data']['total_true_positives']),
         }
         // eslint-disable-next-line no-unused-vars
       }).catch((err) => {/*pass to global error handler*/})
@@ -78,10 +80,10 @@ export default {
           <v-card title="Repositories" subtitle="total" :text="overviewData.reposAmount"></v-card>
         </v-col>
         <v-col :class="overviewElement">
-          <v-card title="False-Positives" subtitle="total" :text="'Todo'"></v-card>
+          <v-card title="False Positives" subtitle="total" :text="overviewData.totalFalsePositives"></v-card>
         </v-col>
         <v-col :class="overviewElement">
-          <v-card title="Weitere Infos auf 1 Blick" subtitle="total" text="yolo"></v-card>
+          <v-card title="True Positives" subtitle="total" :text="overviewData.totalTruePositives"></v-card>
         </v-col>
       </v-row>
     </v-container>
