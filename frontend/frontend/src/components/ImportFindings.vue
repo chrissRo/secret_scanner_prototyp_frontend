@@ -30,9 +30,11 @@ export default {
         findingFiles: [],
         cancelImport: false,
         uploadDialog: false,
-        snackbarMessage: '',
+        errorSnackbarMessage: '',
         snackbarTimeout: 3000,
-        uploadStepCounter: 0
+        uploadStepCounter: 0,
+        uploadResponseMessage: null,
+        errorSnackbar: false
       }
     },
   methods: {
@@ -51,17 +53,27 @@ export default {
             '/finding/file_upload',
             formData,
             { headers: {'Content-Type': 'multipart/form-data'}}
-          ).then((res) => {
-            console.log(res)
-            this.snackbarMessage = res.data.message + ': ' + res.data.data
-            this.uploadDialog = true
+          ).then(async (res) => {
+            await this.startFileImport(res.data.data, formData)
           }).catch((err) => {
-            console.log(err.toString())
-            this.snackbarMessage = err.toString()
-            this.uploadDialog = true
+            this.errorSnackbarMessage = err.toString()
+            this.errorSnackbar = true
           })
         })
         this.findingFiles = []
+      },
+      async startFileImport(file, formData){
+        console.log('start import')
+        console.log(file)
+        this.$axios.defaults.headers.Authorization = `Bearer ${this.tokenStore.token}`
+        this.$axios.post(`/scan_manager/start_import/${file}`, formData).then((res) => {
+          console.log(res.data)
+          this.uploadResponseMessage = res.data.data
+          this.uploadDialog = true
+        }).catch((err) => {
+          this.errorSnackbarMessage = err.response.data.detail
+          this.errorSnackbar = true
+        })
       },
       async getAvailableScanner() {
         this.$axios.defaults.headers.Authorization = `Bearer ${this.tokenStore.token}`
@@ -187,8 +199,32 @@ export default {
       <!--ImportFindingsProcessUploadLoader :props-dialog="uploadDialog" :props-step-counter="uploadStepCounter"/-->
 
     </v-card>
-    <v-snackbar v-model="uploadDialog" :timeout="snackbarTimeout" rounded="pill" color="primary">
-      {{this.snackbarMessage}}
+    <v-dialog v-model="uploadDialog">
+      <v-card>
+        <v-card-title>Import Status</v-card-title>
+        <v-card-subtitle>Uploading and Processing finished successfully</v-card-subtitle>
+        <v-card-text>
+          <v-list style="overflow: hidden">
+            <v-row>
+              <v-col>Total Processed Findings:</v-col><v-col>{{this.uploadResponseMessage.db_results.length + this.uploadResponseMessage.already_stored.length}}</v-col>
+            </v-row>
+            <v-row>
+              <v-col>New Findings added:</v-col><v-col>{{this.uploadResponseMessage.db_results.length}}</v-col>
+            </v-row>
+            <v-row>
+              <v-col>Already found in Database:</v-col><v-col>{{this.uploadResponseMessage.already_stored.length}}</v-col>
+            </v-row>
+          </v-list>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn @click="this.uploadDialog = false" color="info">Close</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-snackbar multi-line v-model="this.errorSnackbar" :timeout="snackbarTimeout" rounded="pill" color="red">
+      {{ this.errorSnackbarMessage }}
     </v-snackbar>
   </v-dialog>
+
 </template>

@@ -13,9 +13,11 @@ axiosClient.interceptors.response.use((res) => res, (err) => {
       break
     case 401:
       return Promise.reject(err)
+    case 404:
+      return Promise.reject(err)
     case 422:
       return Promise.reject(err)
     default:
-      console.log('Unknown StatusCode ->' + err.response.status)
+      console.log('Unknown StatusCode -> ' + err.response.status)
   }
 })
