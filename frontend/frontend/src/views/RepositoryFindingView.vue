@@ -64,8 +64,8 @@ export default {
           documentsAmount: String(res.data['data']['total_number_of_documents']),
           falsePositivesAmount: String(res.data['data']['total_number_of_false_positives']),
           truePositivesAmount: String(res.data['data']['total_number_of_true_positives']),
-          toReviewAmount: String(res.data['data']['total_number_of_todos']),
-          lastScanData: this.lastScan
+          lastScanData: this.lastScan,
+          totalInitialValues: String(res.data['data']['total_initial_values'])
         }
         // eslint-disable-next-line no-unused-vars
       }).catch((err) => {/*pass to global error handler*/})
@@ -122,7 +122,7 @@ export default {
           <v-card title="True-Positives" subtitle="total" :text="overviewData.truePositivesAmount"></v-card>
         </v-col>
         <v-col :class="overviewElement">
-          <v-card title="To-Review" subtitle="total" :text="overviewData.toReviewAmount"></v-card>
+          <v-card title="Initial Values" subtitle="total" :text="overviewData.totalInitialValues"></v-card>
         </v-col>
         <v-col :class="overviewElement">
           <v-card title="Date of Last Scan" subtitle="Timestamp" :text="formatScanDate(lastScan)"></v-card>

@@ -1,18 +1,26 @@
 <script>
 import moment from "moment/moment";
 import scannerType from "@/api/apiModel";
+import {useTokenStore} from "@/store/token";
 
 export default {
   props: {
     repository: {},
     overviewData: {}
   },
-  created() {
+  setup() {
+    return {
+      tokenStore: useTokenStore(),
+    }
+  },
+  created: function () {
     this.repo = {...this.repository}
+    this.getOverviewData()
   },
   data() {
     return {
-      repo: {}
+      repo: {},
+      repoOverviewData: {}
     }
   },
   methods: {
@@ -30,7 +38,18 @@ export default {
     getDocumentCountForRepo(repoName){
       let data = this.overviewData.documentsPerRepository.filter((r) => r['_id'] === repoName)
       return data[0]['count']
-    }
+    },
+    async getOverviewData() {
+      this.$axios.defaults.headers.Authorization = `Bearer ${this.tokenStore.token}`
+      this.$axios.get(`/finding/repository/${this.repo.repositoryName}/count`).then((res) => {
+        this.repoOverviewData = {
+          falsePositivesAmount: String(res.data['data']['total_number_of_false_positives']),
+          truePositivesAmount: String(res.data['data']['total_number_of_true_positives']),
+          totalInitialValues: String(res.data['data']['total_initial_values'])
+        }
+        // eslint-disable-next-line no-unused-vars
+      }).catch((err) => {/*pass to global error handler*/})
+    },
   }
 }
 </script>
@@ -48,7 +67,9 @@ export default {
       {{ formatScanDate(repo.scanEndTime) }}
     </v-col>
     <v-col>
-      {{getDocumentCountForRepo(repo.repositoryName)}}
+      <v-chip lable="init" class="mr-2" color="primary" text-color="white" >initial: {{this.repoOverviewData.totalInitialValues}}</v-chip>
+      <v-chip lable="true" class="mr-2" color="red" text-color="white" >true: {{this.repoOverviewData.truePositivesAmount}}</v-chip>
+      <v-chip lable="false" class="mr-2" color="info" text-color="white" >false: {{this.repoOverviewData.falsePositivesAmount}}</v-chip>
     </v-col>
     <v-col v-if="repo.repositoryPath != '.'" style="text-align: right;">
       Manual Import
