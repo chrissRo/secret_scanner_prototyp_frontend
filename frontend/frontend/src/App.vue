@@ -1,7 +1,6 @@
 <script>
 import TitleBar from '@/components/TitleBar.vue'
 export default {
-
   components: {
     TitleBar,
   },

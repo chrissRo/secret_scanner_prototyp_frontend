@@ -15,27 +15,18 @@ export default {
       password: '',
       loginForm: 'login-form',
       loginFailed: false,
-      snackbarTimeout: 1000,
+      snackbarTimeout: 3000,
     }
   },
   methods: {
     async login() {
-      console.log('Login ->' + this.username + ':' + this.password)
-      // Todo api-call for login
       let formData = new FormData()
       formData.append('username', this.username)
       formData.append('password', this.password)
 
-      let config = {
-        headers: {
-          'Access-Control-Allow-Origin': '*'
-        }
-      }
-
-      this.$axios.post('/token/', formData, config).then((r) => {
-        console.log(r)
-        console.log('Token -> ' + this.tokenStore.token)
-        if(this.tokenStore.token) {
+      this.$axios.post('/token/', formData).then((r) => {
+        if(r.data['access_token']) {
+          this.tokenStore.token = r.data['access_token']
           this.loginFailed = false
           this.$router.push('/')
         } else {
@@ -87,7 +78,7 @@ export default {
         </v-row>
         <v-row>
           <v-snackbar v-model="loginFailed" :timeout="snackbarTimeout" rounded="pill" color="primary">
-            Username or Password incorred. Please try again <v-icon>mdi-alert-circle</v-icon>
+            Username or Password incorred. Please try again
           </v-snackbar>
         </v-row>
       </v-form>

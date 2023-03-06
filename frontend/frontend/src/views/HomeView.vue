@@ -1,37 +1,66 @@
 <script>
 
+import {useTokenStore} from "@/store/token";
+import RepositoryListItem from "@/components/RepositoryListItem";
+
 export default {
+  setup() {
+    return {
+      tokenStore: useTokenStore()
+    }
+  },
+  components: {
+    RepositoryListItem,
+  },
+  created() {
+    this.getOverviewData()
+    this.getRepositoryList()
+  },
   data() {
-    const repoMockList =[
-      { id:  0, name: "Repo1", lastScan: '2022-12-12:00:08:'},
-      { id:  1, name: "Repo2", lastScan: '2022-12-12:00:08:'},
-      { id:  2, name: "Repo3", lastScan: '2022-12-12:00:08:'},
-      { id:  3, name: "Repo4", lastScan: '2022-12-12:00:08:'},
-    ]
     return {
       overviewBlock: 'overview-block',
+      overviewElementContainer: 'overview-element-container',
+      overviewElements: 'overview-elements',
       overviewElement: 'overview-element',
       repoList: 'repo-list',
       repoSearchBar: 'repo-search-bar',
-      repoMockList,
+      repositoryList: [],
       listItem: 'list-item',
-      searchRepo: null
+      listHeader: 'list-header',
+      searchRepo: null,
+      overviewData: {},
     }
   },
   methods: {
-    getOverviewData() {
-      return {
-        reposAmount: this.repoMockList.length,
-        falsePositivesAmount: 2
-      }
-    }
+    async getOverviewData() {
+      this.$axios.defaults.headers.Authorization = `Bearer ${this.tokenStore.token}`
+      this.$axios.get('/finding/count').then((res) => {
+        this.overviewData = {
+          documentsAmount: String(res.data['data']['total_number_of_documents']),
+          reposAmount: String(res.data['data']['total_number_of_distinct_repos']),
+          documentsPerRepository: res.data['data']['documents_per_repository'],
+          totalFalsePositives: String(res.data['data']['total_false_positives']),
+          totalTruePositives: String(res.data['data']['total_true_positives']),
+          totalInitialValues: String(res.data['data']['total_initial_values'])
+        }
+        // eslint-disable-next-line no-unused-vars
+      }).catch((err) => {/*pass to global error handler*/})
+  },
+    async getRepositoryList() {
+      this.$axios.defaults.headers.Authorization = `Bearer ${this.tokenStore.token}`
+      this.$axios.get('/finding/overview').then((res) => {
+        this.repositoryList = res.data["data"]
+      }).catch((err) => {
+        console.log(err)
+      })
+    },
   },
   computed: {
     searchRepoList() {
       if (!this.searchRepo) {
-        return this.repoMockList
+        return this.repositoryList
       } else {
-        return this.repoMockList.filter((r) => r.id === this.searchRepo.id)
+        return this.repositoryList.filter((r) => r._id === this.searchRepo._id)
       }
     }
   }
@@ -40,81 +69,84 @@ export default {
 
 <template>
   <div :class="overviewBlock" >
-  <h2>Overview</h2>
-    <v-container>
-      <v-row no-gutters :class="overviewElement">
-        <v-col>
-          <v-card title="#Repos" :text="getOverviewData().reposAmount"></v-card>
+    <v-toolbar color="primary">
+      <v-toolbar-title class="text-h5">Overview</v-toolbar-title>
+    </v-toolbar>
+    <v-container :class="overviewElementContainer" fluid>
+      <v-row no-gutters :class="overviewElements" v-model="overviewData">
+          <v-col :class="overviewElement">
+            <v-card title="Documents" subtitle="total" :text="overviewData.documentsAmount"></v-card>
+          </v-col>
+        <v-col :class="overviewElement">
+          <v-card title="Repositories" subtitle="total" :text="overviewData.reposAmount"></v-card>
         </v-col>
-        <v-col>
-          <v-card title="#Falsch-Positive" :text="getOverviewData().falsePositivesAmount"></v-card>
+        <v-col :class="overviewElement">
+          <v-card title="False Positives" subtitle="total" :text="overviewData.totalFalsePositives"></v-card>
         </v-col>
-        <v-col>
-          <v-card title="Weitere Infos auf 1 Blick" text="yolo"></v-card>
+        <v-col :class="overviewElement">
+          <v-card title="True Positives" subtitle="total" :text="overviewData.totalTruePositives"></v-card>
+        </v-col>
+        <v-col :class="overviewElement">
+          <v-card title="Initial Values" subtitle="total" :text="overviewData.totalInitialValues"></v-card>
         </v-col>
       </v-row>
     </v-container>
   </div>
+  <v-divider inset></v-divider>
 
-    <div :class="repoList">
-      <h2>Repository List</h2>
+  <div :class="repoList">
+    <v-toolbar color="primary">
+      <v-toolbar-title class="text-h5">Repository List</v-toolbar-title>
+    </v-toolbar>
       <v-container :class="repoSearchBar" fluid>
         <v-row >
           <v-col/>
+          <v-col/>
+          <v-col/>
           <v-col>
-            <div>
               <v-autocomplete
-                :items="repoMockList"
+                :items="repositoryList"
                 v-model="searchRepo"
-                item-title="name"
+                item-title="repositoryName"
                 label="Search Repository"
                 prepend-icon="mdi-database-search"
                 clearable
                 return-object
               />
-            </div>
           </v-col>
         </v-row>
-      </v-container>
+      </v-container >
+
       <v-card class="mx-auto" >
+        <v-container fluid>
         <v-list>
-          <v-row>
-            <v-col>
-              RepoName
-              <v-divider/>
-            </v-col>
-            <v-col>
-              LastScan
-              <v-divider/>
-            </v-col>
-            <v-list-item>
-              Go To
-              <v-divider/>
-            </v-list-item>
-          </v-row>
-        <v-list-item
-          v-for="repo in searchRepoList"
-          :key="repo.id"
-          :class="listItem"
-        >
-          <v-container fluid>
-            <v-row >
+          <v-list-item >
+            <v-row :class="listHeader" class="text-h6">
               <v-col>
-                {{ repo.name }}
+                Repository Name
               </v-col>
               <v-col>
-                {{ repo.lastScan }}
+                Scanner Information
               </v-col>
               <v-col>
-                <router-link :to="{name: 'RepositoryView', params: {id: repo.id} }"
-                             v-slot="{route, navigate}">
-                  <v-btn @click="navigate" color="primary">Go to {{ repo.name}}</v-btn>
-                </router-link>
+                Date and time of last scan
+              </v-col>
+              <v-col>
+                Numbers
+              </v-col>
+              <v-col style="text-align: right;">
+                Details
               </v-col>
             </v-row>
-          </v-container>
-        </v-list-item>
+            <v-divider/>
+          </v-list-item>
+
+        <RepositoryListItem
+          v-for="repo in searchRepoList"
+          :key="repo._id"
+          :class="listItem" :repository="repo" :overview-data="this.overviewData"/>
         </v-list>
+        </v-container>
       </v-card>
     </div>
 
@@ -129,8 +161,20 @@ export default {
 .repo-list {
   margin: 3em;
 }
+.overview-elements {
+  margin: 1em
+}
+
 .overview-element {
-  margin: 2em
+  margin: 0.25em
+}
+
+.list-header {
+  margin:auto
+}
+
+.list-item {
+  margin: auto
 }
 
 .list-item:hover {
