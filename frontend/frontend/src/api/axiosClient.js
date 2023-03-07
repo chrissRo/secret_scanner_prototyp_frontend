@@ -2,7 +2,7 @@ import axios from "axios";
 import router from "@/router";
 
 export const axiosClient = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: 'http://fastapi_backend:8000',
   timeout: 1000
 })
 
