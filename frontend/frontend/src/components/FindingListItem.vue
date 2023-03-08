@@ -9,6 +9,7 @@ export default {
       tokenStore: useTokenStore(),
     }
   },
+  emits: ["changeFavouriteStatus"],
   props: {
     scanResult: {},
     bulkEditActive: null
@@ -72,6 +73,7 @@ export default {
       this.$axios.defaults.headers.Authorization = `Bearer ${this.tokenStore.token}`
       this.$axios.put(`/finding/${this.findingData._id}/fav`, {'isFavourite': !this.findingData.isFavourite }).then(() => {
         this.findingData.isFavourite = !this.findingData.isFavourite
+        this.$emit('changeFavouriteStatus', this.findingData)
       }).catch((err) => {
         this.changeStatusErrorMessage = err.response.data.detail[0].msg
         this.changeStatusFailed = true
