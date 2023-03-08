@@ -102,6 +102,7 @@ export default {
       </span>
     </v-col>
     <v-col>
+      <!--if false-positive is true, then it is an false-positive-->
       <v-chip v-if="findingData.falsePositive.isFalsePositive" class="ma-2" color="primary" text-color="white">False Positive</v-chip>
       <v-chip v-else class="ma-2" color="red" text-color="white">True Positive</v-chip>
       <v-chip v-if="findingData.falsePositive.justification === 'init'" class="ma-2" color="info" text-color="white" >Initial</v-chip>
@@ -133,8 +134,8 @@ export default {
             <v-card-title>Status-Overview</v-card-title>
             <v-card-subtitle>Change Date: {{formatScanDate(findingData.falsePositive.change_date)}}</v-card-subtitle>
             <v-card-text>
-              <v-checkbox v-if="falsePositiveReadOnly === true" label="False-Positive" v-model="findingData.falsePositive.isFalsePositive" disabled></v-checkbox>
-              <v-checkbox v-else label="False-Positive" v-model="findingData.falsePositive.isFalsePositive"></v-checkbox>
+              <v-checkbox v-if="falsePositiveReadOnly === true" label="Is False Positive" v-model="findingData.falsePositive.isFalsePositive" disabled></v-checkbox>
+              <v-checkbox v-else label="Is False Positive" v-model="findingData.falsePositive.isFalsePositive"></v-checkbox>
               <v-textarea
                 :readonly="falsePositiveReadOnly"
                 v-model="findingData.falsePositive.justification"
