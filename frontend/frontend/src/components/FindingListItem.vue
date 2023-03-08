@@ -9,7 +9,10 @@ export default {
       tokenStore: useTokenStore(),
     }
   },
-  emits: ["changeFavouriteStatus"],
+  emits: [
+    "changeFavouriteStatus",
+    "changeFalsePositiveStatus"
+  ],
   props: {
     scanResult: {},
     bulkEditActive: null
@@ -43,6 +46,7 @@ export default {
         this.changeStatusSuccessMessage = res.data.message
         this.changeStatusSuccess = true
         this.findingData = res.data.data
+        this.$emit('changeFalsePositiveStatus', this.findingData)
       }).catch((err) => {
         this.changeStatusErrorMessage = err.response.data.detail[0].msg
         this.changeStatusFailed = true
@@ -60,7 +64,7 @@ export default {
         this.changeStatusSuccessMessage = res.data.message
         this.changeStatusSuccess = true
         this.findingData = res.data.data
-        console.log(this.findingData)
+        this.$emit('changeFalsePositiveStatus', this.findingData)
       }).catch((err) => {
         this.changeStatusErrorMessage = err.response.data.detail[0].msg
         this.changeStatusFailed = true

@@ -78,6 +78,9 @@ export default {
     formatScanDate(scanDateTime){
       return moment(String(scanDateTime)).format('MMMM Do YYYY, HH:mm:ss')
     },
+    updateFalsePositiveStatus(finding) {
+      this.filteredFindingsList.splice(this.filteredFindingsList.indexOf(finding), 1)
+    }
   },
   computed: {
     filteredFindingsList() {
@@ -172,6 +175,8 @@ export default {
                            :key="scanResult._id"
                            :scan-result="scanResult"
                            :bulk-edit-active="bulkEditActive"
+                           @changeFalsePositiveStatus="this.updateFalsePositiveStatus(scanResult)"
+
           />
         </div>
 
