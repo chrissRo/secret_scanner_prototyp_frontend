@@ -29,10 +29,10 @@ export default {
 <template>
       <v-toolbar border>
         <v-btn @click="$router.back()"><v-icon x-large>mdi-arrow-left-circle</v-icon></v-btn>
-        <v-toolbar-title>Welcome to FP-Marker</v-toolbar-title>
+        <v-toolbar-title>Welcome to Gitleaks Review Frontend</v-toolbar-title>
         <v-spacer></v-spacer>
         <div :class="navigationButtonGroup">
-          <v-btn :class="navigationButton" variant="tonal" color="info">Files-View</v-btn>
+          <!--v-btn :class="navigationButton" variant="tonal" color="info">Files-View</v-btn-->
           <ToolbarMenuDropdown/>
         </div>
       </v-toolbar>
