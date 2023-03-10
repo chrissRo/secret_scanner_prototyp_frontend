@@ -145,17 +145,17 @@ export default {
           <v-row>
             <v-col>
               <v-text-field
-                label="Repository Name*"
+                label="Repository Display Name*"
                 required
                 v-model="this.repositoryInformation.repositoryName"
-              ></v-text-field>
+              ><v-tooltip text="Display name of repository" location="bottom" activator="parent"></v-tooltip></v-text-field>
             </v-col>
           <v-col>
             <v-text-field
               label="Repository Path/Address*"
               required
               v-model="this.repositoryInformation.repositoryPath"
-            ></v-text-field>
+            ><v-tooltip text="Full URL/path to repository, used to create links to Online-Repository" location="bottom" activator="parent"></v-tooltip></v-text-field>
           </v-col>
           </v-row>
         </v-list-item>
