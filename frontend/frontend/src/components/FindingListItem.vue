@@ -129,6 +129,9 @@ export default {
           </v-card-actions>
         </v-card>
       </v-dialog>
+      <v-btn v-if="findingData.repositoryPath !== '.'" :href="`${findingData.repositoryPath}/commit/${findingData.resultRaw.Commit}`" target="_blank" color="primary" style="margin-left: 1em">
+        <v-icon>mdi-source-branch</v-icon>
+      </v-btn>
       <v-dialog v-model="falsePositiveDialog" width="500">
         <template v-slot:activator="{props}">
           <v-btn v-bind="props" color="primary" style="margin-left: 1em"><v-icon>mdi-pencil-outline</v-icon> Status</v-btn>
