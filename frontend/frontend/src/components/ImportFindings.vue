@@ -63,11 +63,8 @@ export default {
         this.findingFiles = []
       },
       async startFileImport(file, formData){
-        console.log('start import')
-        console.log(file)
         this.$axios.defaults.headers.Authorization = `Bearer ${this.tokenStore.token}`
         this.$axios.post(`/scan_manager/start_import/${file}`, formData).then((res) => {
-          console.log(res.data)
           this.uploadResponseMessage = res.data.data
           this.uploadDialog = true
         }).catch((err) => {
@@ -213,6 +210,9 @@ export default {
             </v-row>
             <v-row>
               <v-col>Already found in Database:</v-col><v-col>{{this.uploadResponseMessage.already_stored.length}}</v-col>
+            </v-row>
+            <v-row>
+              <v-col>Errors during processing:</v-col><v-col>{{this.uploadResponseMessage.errors}}</v-col>
             </v-row>
           </v-list>
         </v-card-text>
