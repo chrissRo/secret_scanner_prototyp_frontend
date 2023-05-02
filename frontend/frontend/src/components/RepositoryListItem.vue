@@ -2,6 +2,7 @@
 import moment from "moment/moment";
 import scannerType from "@/api/apiModel";
 import {useTokenStore} from "@/store/token";
+import repositoryIcons from "@/styles/repositoryIcons";
 
 export default {
   props: {
@@ -50,6 +51,24 @@ export default {
         // eslint-disable-next-line no-unused-vars
       }).catch((err) => {/*pass to global error handler*/})
     },
+    getRepositoryIcon(repositoryPath){
+      let icon = repositoryIcons['default']
+      try{
+        const domain = new URL(repositoryPath).hostname
+        if(domain){
+          // handle if domain contains subdomain
+          let hostname = domain.split('.')
+          if(hostname.length === 2){
+            hostname = hostname[0]
+          } else {
+            hostname = hostname[1]
+          }
+          icon = repositoryIcons[hostname]
+        }
+        // eslint-disable-next-line no-unused-vars
+      }catch (TypeError){ /* just ignore, default icon already set */ }
+      return icon
+    }
   }
 }
 </script>
@@ -71,7 +90,7 @@ export default {
       <v-chip lable="true" class="mr-2" color="red" text-color="white" >true: {{this.repoOverviewData.truePositivesAmount}}</v-chip>
       <v-chip lable="false" class="mr-2" color="info" text-color="white" >false: {{this.repoOverviewData.falsePositivesAmount}}</v-chip>
     </v-col>
-    <v-col v-if="repo.repositoryPath != '.'" style="text-align: right;">
+    <v-col v-if="repo.repositoryPath === '.'" style="text-align: right;">
       Manual Import
       <router-link :to="{name: 'RepositoryFindingView', params: {id: repo.repositoryName, lastScan: repo.scanEndTime}}"
                    v-slot="{navigate}"
@@ -82,8 +101,8 @@ export default {
       </router-link>
     </v-col>
     <v-col v-else style="text-align: right;">
-      <v-btn href="https://gitlab.com/TODO" color="primary">
-        <v-icon>mdi-gitlab</v-icon>
+      <v-btn :href="repo.repositoryPath" target="_blank" color="primary">
+        <v-icon>{{getRepositoryIcon(repo.repositoryPath)}}</v-icon>
       </v-btn>
       <router-link :to="{name: 'RepositoryFindingView', params: {id: repo.repositoryName, lastScan: repo.scanEndTime}}"
                    v-slot="{navigate}"

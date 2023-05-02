@@ -9,6 +9,10 @@ export default {
       tokenStore: useTokenStore(),
     }
   },
+  emits: [
+    "changeFavouriteStatus",
+    "changeFalsePositiveStatus"
+  ],
   props: {
     scanResult: {},
     bulkEditActive: null
@@ -42,6 +46,7 @@ export default {
         this.changeStatusSuccessMessage = res.data.message
         this.changeStatusSuccess = true
         this.findingData = res.data.data
+        this.$emit('changeFalsePositiveStatus', this.findingData)
       }).catch((err) => {
         this.changeStatusErrorMessage = err.response.data.detail[0].msg
         this.changeStatusFailed = true
@@ -59,7 +64,7 @@ export default {
         this.changeStatusSuccessMessage = res.data.message
         this.changeStatusSuccess = true
         this.findingData = res.data.data
-        console.log(this.findingData)
+        this.$emit('changeFalsePositiveStatus', this.findingData)
       }).catch((err) => {
         this.changeStatusErrorMessage = err.response.data.detail[0].msg
         this.changeStatusFailed = true
@@ -72,6 +77,7 @@ export default {
       this.$axios.defaults.headers.Authorization = `Bearer ${this.tokenStore.token}`
       this.$axios.put(`/finding/${this.findingData._id}/fav`, {'isFavourite': !this.findingData.isFavourite }).then(() => {
         this.findingData.isFavourite = !this.findingData.isFavourite
+        this.$emit('changeFavouriteStatus', this.findingData)
       }).catch((err) => {
         this.changeStatusErrorMessage = err.response.data.detail[0].msg
         this.changeStatusFailed = true
@@ -100,6 +106,7 @@ export default {
       </span>
     </v-col>
     <v-col>
+      <!--if false-positive is true, then it is an false-positive-->
       <v-chip v-if="findingData.falsePositive.isFalsePositive" class="ma-2" color="primary" text-color="white">False Positive</v-chip>
       <v-chip v-else class="ma-2" color="red" text-color="white">True Positive</v-chip>
       <v-chip v-if="findingData.falsePositive.justification === 'init'" class="ma-2" color="info" text-color="white" >Initial</v-chip>
@@ -122,6 +129,9 @@ export default {
           </v-card-actions>
         </v-card>
       </v-dialog>
+      <v-btn v-if="findingData.repositoryPath !== '.'" :href="`${findingData.repositoryPath}/commit/${findingData.resultRaw.Commit}`" target="_blank" color="primary" style="margin-left: 1em">
+        <v-icon>mdi-source-branch</v-icon>
+      </v-btn>
       <v-dialog v-model="falsePositiveDialog" width="500">
         <template v-slot:activator="{props}">
           <v-btn v-bind="props" color="primary" style="margin-left: 1em"><v-icon>mdi-pencil-outline</v-icon> Status</v-btn>
@@ -131,8 +141,8 @@ export default {
             <v-card-title>Status-Overview</v-card-title>
             <v-card-subtitle>Change Date: {{formatScanDate(findingData.falsePositive.change_date)}}</v-card-subtitle>
             <v-card-text>
-              <v-checkbox v-if="falsePositiveReadOnly === true" label="False-Positive" v-model="findingData.falsePositive.isFalsePositive" disabled></v-checkbox>
-              <v-checkbox v-else label="False-Positive" v-model="findingData.falsePositive.isFalsePositive"></v-checkbox>
+              <v-checkbox v-if="falsePositiveReadOnly === true" label="Is False Positive" v-model="findingData.falsePositive.isFalsePositive" disabled></v-checkbox>
+              <v-checkbox v-else label="Is False Positive" v-model="findingData.falsePositive.isFalsePositive"></v-checkbox>
               <v-textarea
                 :readonly="falsePositiveReadOnly"
                 v-model="findingData.falsePositive.justification"

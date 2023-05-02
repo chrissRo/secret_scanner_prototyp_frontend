@@ -3,7 +3,7 @@ import router from "@/router";
 
 export const axiosClient = axios.create({
   baseURL: 'http://localhost:8000',
-  timeout: 1000
+  timeout: 10000
 })
 
 axiosClient.interceptors.response.use((res) => res, (err) => {

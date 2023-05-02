@@ -173,8 +173,6 @@ export default {
             <v-divider/>
           </v-list-item>
         </v-list>
-
-
         <v-list>
           <FindingListItem v-for="scanResult in filteredFindingsList" :key="scanResult._id" :scan-result="scanResult" :bulk-edit-active="bulkEditActive"/>
           <v-pagination

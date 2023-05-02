@@ -63,11 +63,8 @@ export default {
         this.findingFiles = []
       },
       async startFileImport(file, formData){
-        console.log('start import')
-        console.log(file)
         this.$axios.defaults.headers.Authorization = `Bearer ${this.tokenStore.token}`
         this.$axios.post(`/scan_manager/start_import/${file}`, formData).then((res) => {
-          console.log(res.data)
           this.uploadResponseMessage = res.data.data
           this.uploadDialog = true
         }).catch((err) => {
@@ -145,17 +142,17 @@ export default {
           <v-row>
             <v-col>
               <v-text-field
-                label="Repository Name*"
+                label="Repository Display Name*"
                 required
                 v-model="this.repositoryInformation.repositoryName"
-              ></v-text-field>
+              ><v-tooltip text="Display name of repository" location="bottom" activator="parent"></v-tooltip></v-text-field>
             </v-col>
           <v-col>
             <v-text-field
               label="Repository Path/Address*"
               required
               v-model="this.repositoryInformation.repositoryPath"
-            ></v-text-field>
+            ><v-tooltip text="Full URL/path to repository, used to create links to Online-Repository" location="bottom" activator="parent"></v-tooltip></v-text-field>
           </v-col>
           </v-row>
         </v-list-item>
@@ -213,6 +210,9 @@ export default {
             </v-row>
             <v-row>
               <v-col>Already found in Database:</v-col><v-col>{{this.uploadResponseMessage.already_stored.length}}</v-col>
+            </v-row>
+            <v-row>
+              <v-col>Errors during processing:</v-col><v-col>{{this.uploadResponseMessage.errors}}</v-col>
             </v-row>
           </v-list>
         </v-card-text>
